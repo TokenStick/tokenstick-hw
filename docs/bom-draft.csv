@@ -2,7 +2,7 @@ Ref,Block,Part,Value,Package,Status,Notes
 U1,RK1828,RK1828,,FCBGA-746,Unverified land,Symbol and footprint generated from datasheet pin list
 C15-C16,RK1828,Capacitor,100nF,0402,OK,SuperSpeed TX AC coupling
 R13,RK1828,Resistor,0R,0402,To confirm,Boot strap on SARADC_IN0_BOOT
-J1,USB-C DATA,12401610E4#2A (LCSC C2681555),,SMD,OK,24-pin USB-C receptacle
+J1,USB-C DATA,Amphenol 12401610E4#2A (LCSC C5119948),,SMD + THT,OK,24-pin USB-C receptacle (hybrid mount)
 U3,USB-C DATA,HD3SS3220RNHR,,QFN-30,Checked vs datasheet,CC controller and SuperSpeed mux; UFP and GPIO mode
 U4-U5,USB-C DATA,TPD4E05U06DQAR,,USON-10,OK,ESD on SuperSpeed pairs
 R7,USB-C DATA,Resistor,900k,0402,Checked vs datasheet,VBUS_DET series resistor
