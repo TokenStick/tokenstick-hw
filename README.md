@@ -60,6 +60,18 @@ See `docs/design-notes.md` for details.
 
 ## License
 
-Not chosen yet. Until a license is added, all rights are reserved.
+Copyright TokenStick contributors 2026.
+
+This source describes Open Hardware and is licensed under the CERN-OHL-S v2.
+
+You may redistribute and modify this source and make products using it under the terms of the CERN-OHL-S v2 (see `LICENSE`, or https://ohwr.org/cern_ohl_s_v2.txt).
+
+This source is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY, INCLUDING OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE. Please see the CERN-OHL-S v2 for applicable conditions.
+
+Source location: https://github.com/TokenStick/tokenstick-hw
+
+As per CERN-OHL-S v2 section 4, should you produce hardware based on this source, you must where practicable maintain the Source Location visible on the external case of the product or other products you make using this source.
+
+The TokenStick name and logo in `assets/` are not covered by this licence.
 
 Rockchip, RK1820 and RK1828 are trademarks of their owner. This project is not affiliated with Rockchip.
