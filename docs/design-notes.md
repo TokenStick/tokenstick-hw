@@ -214,3 +214,13 @@ DRC is unchanged: clean apart from the RK1828 pins that are not designed and C16
 - 42 designators placed; C15, C7, R5 and R8 have no free position and are hidden on the silkscreen (they remain in the fabrication layer and the position file)
 - The RK1828 and the logotype carry no designator
 - KiCad warns that 0.6 mm text is below its default minimum of 0.8 mm; most fabs print 0.6 mm at 0.1 mm line width, confirm with the chosen fab
+
+## 16. Cherry Blossom project synced (2026-11-14)
+
+The Cherry Blossom project was brought in line with the KiCad design so the two no longer contradict each other:
+
+- Netlist: 3.3 V regulator U7 with C18 and C19 added; ESD channel assignment and the lane 1 polarity exchange applied; the pass-through pads of the ESD arrays connected
+- Placement: all parts moved to the KiCad positions. Footprint origins differ between the two tools, so J1 sits 0.5 mm further in and J2 hangs over the board edge in Cherry Blossom
+- Routing: Cherry Blossom's autorouter connects 122 of 141 connections on this placement. The open ones are again in the USB corner and at fine-pitch pins. The hand-defined routes, copper areas and gold openings of the KiCad board cannot be transferred
+
+KiCad (`kicad/tokenstick/`) is the source for fabrication. The Cherry Blossom project is a browsable copy of schematic and placement.
