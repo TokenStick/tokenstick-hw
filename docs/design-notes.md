@@ -311,4 +311,4 @@ Added:
 
 `stusb4500-nvm.md` lists the NVM settings. Voltages and switch behaviour are fixed there; the profile currents are provisional until the power budget is known.
 
-The Cherry Blossom copy does not have these changes yet.
+The Cherry Blossom copy was brought in line afterwards: test points and fiducials added (own parts, one pad each), the pull-ups exchanged, C15/C16 moved and their tracks redrawn, SCL and SDA drawn by hand from the chip to the pull-ups, the rest autorouted. Its checks show no open connections. It still joins the J1 VBUS pins its own way and has no track on inner layer 3.
