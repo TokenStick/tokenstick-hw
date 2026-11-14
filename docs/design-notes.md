@@ -312,3 +312,25 @@ Added:
 `stusb4500-nvm.md` lists the NVM settings. Voltages and switch behaviour are fixed there; the profile currents are provisional until the power budget is known.
 
 The Cherry Blossom copy was brought in line afterwards: test points and fiducials added (own parts, one pad each), the pull-ups exchanged, C15/C16 moved and their tracks redrawn, SCL and SDA drawn by hand from the chip to the pull-ups, the rest autorouted. Its checks show no open connections. It still joins the J1 VBUS pins its own way and has no track on inner layer 3.
+
+## 22. USB pair impedance checked with a field solver (2026-11-14)
+
+`kicad/tokenstick/impedance_fd.py` is a 2D finite-difference solver for outer-layer tracks. It models what JLCPCB's calculator models: trapezoidal track (top 0.7 mil narrower than the base), 1.6 mil outer copper, solder mask 1.2 mil on the laminate and 0.6 mil on copper with a dielectric constant of 3.8. Against the Hammerstad-Jensen microstrip formula it agrees within 0.5 % for a plain track; grid error is about 0.5 ohm.
+
+JLCPCB gives two values for the outer 3313 prepreg: 0.0994 mm nominal, and 3.5 mil (0.0889 mm) "to use" for outer-layer impedance, with a dielectric constant of 4.05 or 4.1. Both were computed:
+
+| Geometry | 0.0889 mm, 4.05 | 0.0994 mm, 4.1 |
+|---|---|---|
+| Pair 0.15 / 0.15 mm (as drawn), under mask | 84.5 ohm | 87.7 ohm |
+| Pair 0.15 / 0.15 mm, bare (gold) | 91.5 ohm | 95.1 ohm |
+| Pair 0.14 / 0.15 mm, under mask | 87.1 ohm | 90.3 ohm |
+| Pair 0.13 / 0.15 mm, under mask | 89.9 ohm | 93.1 ohm |
+| Single 0.15 mm, under mask | 47.8 ohm | 50.5 ohm |
+| Single 0.10 mm (BGA field), under mask | 57.1 ohm | 59.9 ohm |
+
+Reading:
+
+- The drawn pairs are 85 to 88 ohm under mask, 3 to 6 % below 90 ohm and inside the usual 10 % window. The 89 ohm from the IPC-2141 formula (section 19) was a few ohm high because it ignores the mask
+- Where the mask is opened for the gold finish the same pair is about 7 ohm higher. A SuperSpeed pair therefore steps between about 85 and 92 ohm at every opening. The sections are a few millimetres long, so the effect should be small, but it is a discontinuity the gold finish adds
+- The 0.10 mm tracks inside the BGA field are about 57 to 60 ohm single-ended; unavoidable at this pitch and short (about 1.5 mm)
+- Not done: JLCPCB's own online calculator could not be run from here (it is a web application). Enter 90 ohm, differential, outer layer, 6 layers, 1.2 mm there before ordering, or order with impedance control so the fab adjusts the widths

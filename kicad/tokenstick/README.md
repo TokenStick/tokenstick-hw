@@ -10,6 +10,7 @@ python3 build_board.py       # needs the pcbnew module and the KiCad footprint l
 python3 build_schematic.py   # needs the KiCad symbol libraries
 kicad-cli sch export netlist tokenstick.kicad_sch -o /tmp/ts.net && python3 check_netlist.py /tmp/ts.net
 python3 drc.py unconnected_items lib_footprint_issues
+python3 impedance_fd.py      # field solver for the USB pair geometry, takes a few minutes
 ```
 
 State:
