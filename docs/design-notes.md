@@ -156,3 +156,20 @@ Corrections and findings from this step:
 - `kicad/tokenstick/tokenstick.kicad_sch` is generated from the same netlist as the board. It is a label-style schematic (global label on every connected pin, no wires), meant as a correct and checkable netlist view rather than a drawing for reading. Symbols for parts missing in the KiCad library are in `kicad/lib/TokenStick_Parts.kicad_sym`
 - Check: the netlist exported from the schematic with `kicad-cli` was compared with the board netlist; all 571 connected pins agree. Same-name supply balls of the RK1828 (VDD_LOGIC, DRAM rails) are stacked in the symbol and therefore tied to each other, but not yet to a regulator
 - Unused pins carry no-connect flags, except on the RK1828, where the remaining pins are simply not designed yet. ERC has not been run (not available in the KiCad 7 command line)
+
+## 11. Power input and buck routed (2026-11-14)
+
+![Board](img/board-kicad.png)
+
+- The PD input, the back-to-back FETs, the 5 V buck, the 3.3 V regulator and the remaining mux support parts are routed. Parts were re-placed for this: the FETs sit in line with the buck input, the inductor below the converter, the PD controller below the power connector
+- High-current nets use copper areas on the top layer (VBUS, VIN, switch node, 5 V). The FET common source uses two short 0.35 mm tracks between the packages
+- Everything else was routed by `kicad/tokenstick/autoroute.py`, a 0.1 mm grid maze router written for this board (top and bottom layer, 45 degree moves, through vias). Wide tracks (0.35 mm) are used only on pads that carry load current, 0.2 mm elsewhere. Every SMD ground pad has its own via to the inner ground planes; pins next to an exposed pad connect to that pad
+- DRC: no clearance, short or hole errors. Open items in the report are the 365 RK1828 ground balls (no fan-out yet), one VBUS island at J1 and C16 inside the RK1828 courtyard
+
+Known weak points of this pass:
+
+- VBUS reaches the copper area from the J2 pads through two 0.35 mm tracks; widen or pour to the pads before building
+- The 5 V feed to the mux and the 3.3 V regulator is a single 0.35 mm track that passes the RK1828 on the top layer. It will move to a power layer when the RK1828 supplies are designed
+- J1 VBUS: pads A9/B4 are tied and go to the mux VBUS_DET divider; pads A4/B9 are tied to each other but not to the first pair. The plug shorts all four, so detection works, but they should be joined on a power layer
+- No thermal vias under the FETs and the buck converter, no current or temperature calculation
+- The autorouter result is functional, not tidy; review before fabrication
