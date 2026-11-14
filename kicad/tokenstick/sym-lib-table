@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "TokenStick")(type "KiCad")(uri "${KIPRJMOD}/../lib/TokenStick.kicad_sym")(options "")(descr "RK182X"))
+  (lib (name "TokenStick_Parts")(type "KiCad")(uri "${KIPRJMOD}/../lib/TokenStick_Parts.kicad_sym")(options "")(descr "Project symbols"))
+)

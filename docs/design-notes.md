@@ -149,3 +149,10 @@ Corrections and findings from this step:
 - The TPS56637 footprint was written from the TI package drawing dimensions and is not verified
 - L1 is now a 5 x 5 mm footprint (Coilcraft XAL5030 class), which pushed the buck placement to the right of the RK1828
 - The Cherry Blossom project no longer matches: ESD channel assignment, lane 1 polarity and the mux footprint changed here
+
+## 10. 3.3 V regulator and KiCad schematic (2026-11-14)
+
+- Added U7, AP2112K-3.3 (SOT-23-5) with 1 uF on input and output, fed from the 5 V rail, EN tied to VIN. It supplies the HD3SS3220 VCC33 pin and the DIR pull-up. Placed above the mux; not routed. The RK1828 3.3 V rails are not connected to it; their current is unknown
+- `kicad/tokenstick/tokenstick.kicad_sch` is generated from the same netlist as the board. It is a label-style schematic (global label on every connected pin, no wires), meant as a correct and checkable netlist view rather than a drawing for reading. Symbols for parts missing in the KiCad library are in `kicad/lib/TokenStick_Parts.kicad_sym`
+- Check: the netlist exported from the schematic with `kicad-cli` was compared with the board netlist; all 571 connected pins agree. Same-name supply balls of the RK1828 (VDD_LOGIC, DRAM rails) are stacked in the symbol and therefore tied to each other, but not yet to a regulator
+- Unused pins carry no-connect flags, except on the RK1828, where the remaining pins are simply not designed yet. ERC has not been run (not available in the KiCad 7 command line)

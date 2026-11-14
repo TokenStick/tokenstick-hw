@@ -42,6 +42,10 @@ PARTS = {
     "R7": (*R0402, "900k", -25.0, -6.9, 0),
     "R15": (*R0402, "200k", -24.6, 1.1, 0),
     "R13": (*R0402, "0R", -23.0, 0.6, 90),
+    # 3.3 V for the mux
+    "U7": (K("Package_TO_SOT_SMD"), "SOT-23-5", "AP2112K-3.3", -25.0, 7.6, 0),
+    "C18": (*C0402, "1uF", -27.6, 7.6, 90),
+    "C19": (*C0402, "1uF", -25.0, 10.0, 0),
     "U1": (LIB, "Rockchip_RK182X_FCBGA-746_19.0x19.0mm_Layout28x28_P0.65mm", "RK1828", -12.0, 0, 0),
     "LG1": (LIB, "TokenStick_Logotype", "logotype", -24.0, 13.8, 0),
     # 5 V buck
@@ -72,7 +76,7 @@ PARTS = {
 # With the mux on the top side this is the only way to route both lanes of one plug orientation
 # without crossing the pair. USB 3.x receivers must detect and correct lane polarity inversion.
 NETS = {
-    "GND": "J1.A1 J1.A12 J1.B1 J1.B12 J1.S1 U3.4 U3.12 U3.13 U3.28 U3.29 U3.31 U4.3 U4.8 U5.3 U5.8 C7.2 C8.2 R13.2 "
+    "GND": "J1.A1 J1.A12 J1.B1 J1.B12 J1.S1 U3.4 U3.12 U3.13 U3.28 U3.29 U3.31 U4.3 U4.8 U5.3 U5.8 C7.2 C8.2 R13.2 U7.2 C18.2 C19.2 "
            "J2.A1 J2.A12 J2.B1 J2.B12 J2.S1 U2.6 U2.10 U2.12 U2.13 U2.22 U2.25 D1.2 C2.2 C3.2 C4.2 C5.2 C6.2 "
            "U6.3 U6.9 C9.2 C10.2 C12.2 C13.2 C14.2 C17.2 R9.2 R12.2 R14.2",
     "VBUS_DATA": "J1.A4 J1.A9 J1.B4 J1.B9 R7.1",
@@ -86,8 +90,8 @@ NETS = {
     "Net-(C15-1)": "C15.1 U1.AE1", "Net-(C16-1)": "C16.1 U1.AE2",
     "USB_SSRX_P": "U3.9 U1.AF2", "USB_SSRX_N": "U3.10 U1.AG1",
     "USB_DIR": "U3.11 R15.1", "Net-(R7-2)": "R7.2 U3.5", "Net-(R13-1)": "R13.1 U1.W1",
-    "3V3": "U3.8 C7.1 R15.2",
-    "5V": "U3.30 C8.1 L1.2 C12.1 C13.1 C14.1 C17.1 R8.1 R10.1",
+    "3V3": "U3.8 C7.1 R15.2 U7.5 C19.1",
+    "5V": "U7.1 U7.3 C18.1 U3.30 C8.1 L1.2 C12.1 C13.1 C14.1 C17.1 R8.1 R10.1",
     "VIN": "Q1.5 Q1.6 Q1.7 Q1.8 Q1.9 R2.1 C5.1 C6.1 U6.8 C9.1 C10.1 R11.1",
     "VBUS_PD": "J2.A4 J2.A9 J2.B4 J2.B9 Q2.5 Q2.6 Q2.7 Q2.8 Q2.9 U2.24 D1.1 R1.1 C4.1",
     "PD_SRC": "Q1.1 Q1.2 Q1.3 Q2.1 Q2.2 Q2.3 R4.1 C1.1",
