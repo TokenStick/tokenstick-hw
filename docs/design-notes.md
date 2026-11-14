@@ -109,3 +109,9 @@ Conclusion so far: the board outline looks feasible with double-sided assembly, 
 ### First autoroute attempt
 
 Design rules set to a 4 mil class (0.1 mm trace and clearance) because of the 0.65 mm BGA pitch. An exploratory autoroute connected 117 of 134 connections. The 17 left open are mostly at fine-pitch pads: J1 to the ESD parts and the mux, the SuperSpeed RX pair into the RK1828, and USB 2.0 D+/D-. These need the parts near J1 re-placed and the differential pairs routed by hand; the autorouter result is not usable as a final layout.
+
+A second attempt with the mux turned towards J1 connected 112 of 134. The limiting factor is the dual-row 24-pin USB-C receptacle (J1): its two SMD pad rows cannot be fanned out by the autorouter. Routing was cleared again. Options: route the J1 fan-out by hand with vias, or change J1 to a receptacle with one SMD row and one through-hole row.
+
+### Logo
+
+"tokenstick" wordmark on the top side above the RK1828, 2.8 mm tall, as copper with a matching solder mask opening so it shows in ENIG gold on the black board. It uses the editor's stock font; the real logotype (with the USB-C glyph) has to be imported as a graphic in KiCad.
