@@ -368,6 +368,8 @@ def tidy_silk(b, titles):
 
 GOLD_PAD_DISTANCE = 0.6     # solder mask stays closed this close to any pad, so solder cannot run along a bare track
 GOLD_MIN_LENGTH = 0.8
+# USB pairs stay under solder mask: a bare pair is about 7 ohm higher than a covered one (see impedance_fd.py)
+NO_GOLD = {n for n in NETS if n.startswith(("C_TX", "C_RX", "USB_SS", "USB_D"))} - {"USB_DIR"} | {"Net-(C15-1)", "Net-(C16-1)"}
 
 
 def gold_traces(b):
@@ -386,6 +388,7 @@ def gold_traces(b):
     n_open = 0; length = 0.0
     for t in list(b.GetTracks()):
         if t.Type() != pcbnew.PCB_TRACE_T or t.GetLayer() not in arr: continue
+        if t.GetNetname() in NO_GOLD: continue
         x1, y1, x2, y2 = (pcbnew.ToMM(v) for v in (t.GetStart().x, t.GetStart().y, t.GetEnd().x, t.GetEnd().y))
         L = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
         if L < GOLD_MIN_LENGTH: continue

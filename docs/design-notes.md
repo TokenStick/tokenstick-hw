@@ -334,3 +334,5 @@ Reading:
 - Where the mask is opened for the gold finish the same pair is about 7 ohm higher. A SuperSpeed pair therefore steps between about 85 and 92 ohm at every opening. The sections are a few millimetres long, so the effect should be small, but it is a discontinuity the gold finish adds
 - The 0.10 mm tracks inside the BGA field are about 57 to 60 ohm single-ended; unavoidable at this pitch and short (about 1.5 mm)
 - Not done: JLCPCB's own online calculator could not be run from here (it is a web application). Enter 90 ohm, differential, outer layer, 6 layers, 1.2 mm there before ordering, or order with impedance control so the fab adjusts the widths
+
+Decision (same day): the USB pairs (connector to ESD, mux, AC capacitors, RK1828, and D+/D-) stay under solder mask, so each pair has one impedance along its length. Gold openings remain on all other outer-layer tracks: 46 openings, 135 mm (was 67 and 180 mm). With one more free spot the silkscreen now places 39 designators; 13 are hidden (C7 is back).
