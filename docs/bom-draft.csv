@@ -3,30 +3,32 @@ U1,RK1828,RK1828,,FCBGA-746,Unverified land,Symbol and footprint generated from 
 C15-C16,RK1828,Capacitor,100nF,0402,OK,SuperSpeed TX AC coupling
 R13,RK1828,Resistor,0R,0402,To confirm,Boot strap on SARADC_IN0_BOOT
 J1,USB-C DATA,TYPE-C 24P QT (LCSC C2681555),,SMD,OK,24-pin USB-C receptacle
-U3,USB-C DATA,HD3SS3220RNHR,,QFN-30,Circuit to verify,CC controller and SuperSpeed mux
+U3,USB-C DATA,HD3SS3220RNHR,,QFN-30,Checked vs datasheet,CC controller and SuperSpeed mux; UFP and GPIO mode
 U4-U5,USB-C DATA,TPD4E05U06DQAR,,USON-10,OK,ESD on SuperSpeed pairs
-R7,USB-C DATA,Resistor,900k,0402,To verify,VBUS_DET series resistor
+R7,USB-C DATA,Resistor,900k,0402,Checked vs datasheet,VBUS_DET series resistor
+R15,USB-C DATA,Resistor,200k,0402,Checked vs datasheet,DIR pull-up to 3V3 (required)
 C7-C8,USB-C DATA,Capacitor,100nF,0402,OK,Decoupling
 J2,PD POWER INPUT,USB4105-GF-A,,SMD,OK,16-pin USB-C receptacle (power only)
-U2,PD POWER INPUT,STUSB4500QTR,,QFN-24,Circuit to verify,USB PD sink controller; NVM must be programmed
-Q1,PD POWER INPUT,AON7403,,DFN-8 3x3,OK,P-channel 30V VBUS switch
+U2,PD POWER INPUT,STUSB4500QTR,,QFN-24,Checked vs datasheet,USB PD sink controller; NVM must be programmed
+Q1-Q2,PD POWER INPUT,AON7403,,DFN-8 3x3,Checked vs datasheet,Back-to-back P-channel 30V VBUS switch (as in ST reference)
 D1,PD POWER INPUT,SMF24A,,SOD-123F,OK,VBUS TVS
-R1,PD POWER INPUT,Resistor,470,0402,To verify,VBUS_VS_DISCH
-R2,PD POWER INPUT,Resistor,1k,0402,To verify,DISCH
-R3,PD POWER INPUT,Resistor,22k,0402,To verify,Gate drive
-R4,PD POWER INPUT,Resistor,100k,0402,To verify,Gate pull-up
+R1,PD POWER INPUT,Resistor,470,0402,Checked vs datasheet,VBUS_VS_DISCH
+R2,PD POWER INPUT,Resistor,1k,0402,Checked vs datasheet,DISCH
+R3,PD POWER INPUT,Resistor,22k,0402,Checked vs datasheet,Gate drive
+R4,PD POWER INPUT,Resistor,100k,0402,Checked vs datasheet,Gate to common source
 R5-R6,PD POWER INPUT,Resistor,10k,0402,OK,I2C pull-ups
-C1,PD POWER INPUT,Capacitor,100nF,0402,To verify,Gate soft-start
+C1,PD POWER INPUT,Capacitor,100nF,0402,Checked vs datasheet,Gate soft-start
 C2-C3,PD POWER INPUT,Capacitor,1uF,0402,OK,VREG_2V7 and VREG_1V2
 C4,PD POWER INPUT,Capacitor,1uF 50V,0603,OK,VBUS
 C5-C6,PD POWER INPUT,Capacitor,10uF 35V,0805,OK,VIN bulk
-U6,5V BUCK,TPS56637RPAR,,VQFN-10,Circuit to verify,6A buck
-L1,5V BUCK,Inductor,2.2uH,Placeholder,Placeholder,Needs a real 6A+ power inductor
+U6,5V BUCK,TPS56637RPAR,,VQFN-10,Checked vs datasheet,6A buck; values from TI 5V reference design
+L1,5V BUCK,Inductor,3.3uH,Placeholder footprint,Value per TI table; needs a real 6A+ power inductor
 C9-C10,5V BUCK,Capacitor,10uF 35V,0805,OK,Input
 C11,5V BUCK,Capacitor,100nF,0402,OK,Bootstrap
-C12-C14,5V BUCK,Capacitor,22uF 10V,0805,OK,Output
-R8,5V BUCK,Resistor,100k,0402,OK,Feedback top
-R9,5V BUCK,Resistor,13.7k,0402,OK,Feedback bottom
+C12-C14 C17,5V BUCK,Capacitor,22uF 10V,0805,Checked vs datasheet,Output (4 x 22uF)
+R8,5V BUCK,Resistor,73.2k,0402,Checked vs datasheet,Feedback top
+R9,5V BUCK,Resistor,10k,0402,Checked vs datasheet,Feedback bottom
 R10,5V BUCK,Resistor,100k,0402,OK,Power-good pull-up
-R11,5V BUCK,Resistor,100k,0402,To verify,EN pull-up to VIN
-R12,5V BUCK,Resistor,TBD,0402,Placeholder,MODE select; value from TI datasheet
+R11,5V BUCK,Resistor,169k,0402,Checked vs datasheet,EN divider top
+R14,5V BUCK,Resistor,36.1k,0402,Checked vs datasheet,EN divider bottom
+R12,5V BUCK,Resistor,10k,0402,Checked vs datasheet,MODE to GND selects Eco-mode; leave open for FCCM

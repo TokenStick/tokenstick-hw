@@ -39,13 +39,14 @@ RK1820 (2.5 GB DRAM) uses the same package and is a possible lower-cost variant.
 - Nets to the chip: USB_SSTX_P/N, USB_SSRX_P/N, USB_DP, USB_DM, VBUS_DATA
 
 ### PD POWER INPUT
-- 16-pin USB-C receptacle (power only), STUSB4500 standalone PD sink, AON7403 P-channel FET (30 V) as the VBUS switch, 24 V TVS
+- 16-pin USB-C receptacle (power only), STUSB4500 standalone PD sink, two AON7403 P-channel FETs (30 V) back to back as the VBUS switch, 24 V TVS
 - Output net VIN, 9-20 V after negotiation
 - The STUSB4500 NVM must be programmed with the wanted profiles. I2C is pulled up but no programming header exists yet
 
 ### 5V BUCK
-- TPS56637 (6 A), 2.2 uH, feedback 100k / 13.7k for about 4.98 V, power-good on 5V_PG
-- MODE resistor value is a placeholder
+- TPS56637 (6 A), 3.3 uH, 4 x 22 uF output, feedback 73.2k / 10k for 5 V, power-good on 5V_PG
+- EN from a 169k / 36.1k divider on VIN (EN is a 5.5 V pin and must not be pulled up to VIN directly)
+- MODE to GND through 10k for Eco-mode; leave open for FCCM
 
 ### RK1828
 - USB 3.0 on combo PHY 0 (M0), 100 nF AC coupling on TX
@@ -69,3 +70,19 @@ RK1820 (2.5 GB DRAM) uses the same package and is a possible lower-cost variant.
 - Feed the core regulators from VIN directly or from the 5 V rail
 - PCB layer count (6 layers looks feasible because signals escape from one side; not confirmed)
 - Enclosure and cooling concept against the measured power draw
+
+## 7. Datasheet review (2026-11-14)
+
+The three peripheral circuits were first drawn from memory, then checked against the manufacturers' datasheets.
+
+| Part | Finding | Action |
+|---|---|---|
+| TPS56637 | EN is rated 5.5 V; the first draft pulled it up to VIN (up to 20 V) | Replaced with the 169k / 36.1k divider from the TI reference design |
+| TPS56637 | 5 V reference design uses 73.2k / 10k, 3.3 uH and 4 x 22 uF | Values updated, fourth output capacitor added |
+| TPS56637 | MODE: open selects FCCM, 10k or less to GND selects Eco-mode | Placeholder replaced with 10k to GND |
+| STUSB4500 | ST reference uses two back-to-back P-FETs; the first draft had one, which lets VIN feed back to VBUS through the body diode | Second FET added, gate network moved to the common source |
+| STUSB4500 | Pin connections and the 470 / 22k / 100k / 100nF / 1k values match the ST schematic | None |
+| HD3SS3220 | DIR is open drain and needs a pull-up (200k) for proper operation; the first draft left it open | 200k pull-up to 3V3 added |
+| HD3SS3220 | PORT low for UFP, ADDR open for GPIO mode, 900k on VBUS_DET, ENn low | Matches, none |
+
+Not covered by this review: the ST reference also shows a 100 ohm resistor and ESD parts on VBUS and CC whose exact placement was not readable from the extracted schematic text, and no layout guidance was checked.
