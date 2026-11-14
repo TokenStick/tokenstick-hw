@@ -200,7 +200,8 @@ ROUTE_FIRST = ["VBUS_DATA", "Net-(R7-2)", "3V3"]      # short nets in the crowde
 HAND_ROUTED = {t[0] for t in TRACKS} - {"PD_SRC", "BUCK_SW", "3V3", "VBUS_DATA", "Net-(R7-2)"}
 
 
-def build():
+def build(hand=True, auto=True):
+    """hand: add the hand-defined routes; auto: run autoroute.py, gold openings and silkscreen clean-up."""
     b = pcbnew.BOARD()
     b.SetCopperLayerCount(6)
     ds = b.GetDesignSettings()
@@ -253,11 +254,11 @@ def build():
     missing = sorted(set(pin_net) - used)
     assert not missing, missing
 
-    for name, layer, w, pts in TRACKS:
+    for name, layer, w, pts in (TRACKS if hand else []):
         for a, c in zip(pts, pts[1:]):
             t = pcbnew.PCB_TRACK(b); t.SetStart(P(*a)); t.SetEnd(P(*c)); t.SetWidth(mm(w))
             t.SetLayer(b.GetLayerID(layer)); t.SetNet(net(name)); b.Add(t)
-    for name, x, y in VIAS:
+    for name, x, y in (VIAS if hand else []):
         v = pcbnew.PCB_VIA(b); v.SetPosition(P(x, y)); v.SetWidth(mm(VIA_D)); v.SetDrill(mm(VIA_DRILL))
         v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu); v.SetNet(net(name)); b.Add(v)
 
@@ -267,15 +268,16 @@ def build():
         for x, y in ((xa, ya), (xb, ya), (xb, yb), (xa, yb)): o.Append(mm(OX + x), mm(OY - y))
         z.SetLocalClearance(mm(0.2)); z.SetMinThickness(mm(0.15)); z.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL)
         b.Add(z)
-    import autoroute
-    autoroute.run(b, net, sys.modules[__name__])
+    if auto:
+        import autoroute
+        autoroute.run(b, net, sys.modules[__name__])
 
-    gold_traces(b)
+    if auto: gold_traces(b)
     titles = (("USB DATA", -34.0, -9.2), ("RK1828", -12.0, -11.2), ("5V BUCK", 13.6, 5.2), ("LOAD SWITCH", 28.15, 3.4), ("USB PD", 27.0, -15.9), ("PWR IN", 38.0, 6.6), ("DATA", -38.0, 6.6))
     for txt, x, y in titles:
         t = pcbnew.PCB_TEXT(b); t.SetText(txt); t.SetLayer(pcbnew.F_SilkS); t.SetPosition(P(x, y))
         t.SetTextSize(pcbnew.VECTOR2I(mm(0.9), mm(0.9))); t.SetTextThickness(mm(0.15)); b.Add(t)
-    tidy_silk(b, titles)
+    if auto: tidy_silk(b, titles)
     r = pcbnew.PCB_SHAPE(b); r.SetShape(pcbnew.SHAPE_T_RECT); r.SetLayer(pcbnew.Dwgs_User); r.SetWidth(mm(0.15))
     r.SetStart(P(-1.0, 16.5)); r.SetEnd(P(6.6, -16.5)); b.Add(r)
     t = pcbnew.PCB_TEXT(b); t.SetText("reserved: RK1828 regulators"); t.SetLayer(pcbnew.Dwgs_User); t.SetPosition(P(2.9, 0)); t.SetTextAngleDegrees(90)

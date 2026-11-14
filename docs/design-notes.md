@@ -224,3 +224,29 @@ The Cherry Blossom project was brought in line with the KiCad design so the two 
 - Routing: Cherry Blossom's autorouter connects 122 of 141 connections on this placement. The open ones are again in the USB corner and at fine-pitch pins. The hand-defined routes, copper areas and gold openings of the KiCad board cannot be transferred
 
 KiCad (`kicad/tokenstick/`) is the source for fabrication. The Cherry Blossom project is a browsable copy of schematic and placement.
+
+## 17. fastroute trial (2026-11-14)
+
+[fastroute](https://github.com/parisxmas/fastroute) is a Rust port of the Freerouting autorouter (GPL-3.0, Specctra DSN in, SES out). `kicad/tokenstick/fr_route.py` exports the board to DSN, runs it and reads the session back.
+
+| Run | Pre-routed | Result (KiCad DRC) |
+|---|---|---|
+| `full` | nothing | no clearance errors, 12 connections open, among them USB_SSRX_P, the TX capacitor net, CC1 and 3V3 |
+| `rest` | hand-defined USB routes | no clearance errors, 1 connection open (VBUS_PD) |
+
+![fastroute](img/board-fastroute.png)
+
+- With the USB section routed by hand, fastroute finishes practically the whole board in about a minute, including the J1 VBUS pads that `autoroute.py` left split
+- On its own it does not complete the USB corner either; the hand routing stays necessary
+- It also "connects" the 365 RK1828 ground balls by chaining them with thin tracks on the top layer. That satisfies DRC but is not an acceptable ground fan-out; those balls need vias to the plane
+- It routes every net at the default 0.15 mm width; power nets need a net class with a wider track before its result can be used
+- Not adopted yet: the board in the repository is still built with `autoroute.py`. Plan: switch the non-USB routing to fastroute with a power net class when the next parts are added, and keep the RK1828 ground out of it
+
+## 18. Requirements from the host software side (2026-11-14, not yet in the design)
+
+1. STUSB4500 I2C and ALERT to the RK1828, so the host can read the negotiated PD contract
+2. Current and power monitor on the 5 V rail (INA226 class)
+3. Board temperature sensor, separate from the chip junction temperature
+4. Unique ID source for the USB serial number (chip OTP or a small EEPROM)
+
+All four hang on one I2C bus of the RK1828. Open before drawing: which RK1828 I2C pins and which IO voltage (not in the datasheet extract used so far), and whether the RK1828 OTP is readable by firmware.
