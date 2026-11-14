@@ -91,7 +91,7 @@ Not covered by this review: the ST reference also shows a 100 ohm resistor and E
 
 A first placement pass in Cherry Blossom to test the stick form factor. Nothing is routed yet.
 
-- Board: 85 x 35 mm, 6 copper layers, 1.2 mm, ENIG
+- Board: 85 x 35 mm, 6 copper layers, 1.2 mm, ENIG finish, black solder mask, white silkscreen
 - J1 (data USB-C) on the left edge, J2 (power USB-C) on the right edge
 - RK1828 left of centre with its USB balls (bottom-left corner of the package) facing the HD3SS3220 and J1
 - 5 V buck above the centre, PD sink and the back-to-back FETs next to J2
@@ -105,3 +105,7 @@ What this does not show:
 - Cooling: the module vendor lists 13.6 W average, which cannot be dissipated passively in this size. The enclosure has to act as the heatsink and may need a fan
 
 Conclusion so far: the board outline looks feasible with double-sided assembly, but it cannot be confirmed before the supply figures arrive from Rockchip.
+
+### First autoroute attempt
+
+Design rules set to a 4 mil class (0.1 mm trace and clearance) because of the 0.65 mm BGA pitch. An exploratory autoroute connected 117 of 134 connections. The 17 left open are mostly at fine-pitch pads: J1 to the ESD parts and the mux, the SuperSpeed RX pair into the RK1828, and USB 2.0 D+/D-. These need the parts near J1 re-placed and the differential pairs routed by hand; the autorouter result is not usable as a final layout.
