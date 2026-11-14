@@ -402,7 +402,8 @@ if __name__ == "__main__":
     # board finish: the Python API of KiCad 7 has no stackup access, so the block is written into the file
     text = open(out).read()
     assert "(stackup" not in text
-    die = [("prepreg", 0.10), ("core", 0.33), ("prepreg", 0.11), ("core", 0.33), ("prepreg", 0.10)]   # placeholder, 1.2 mm total
+    # outer prepreg 0.10 mm is JLCPCB's 6-layer impedance stackup value; core and middle prepreg are placeholders that add up to 1.2 mm
+    die = [("prepreg", 0.10), ("core", 0.33), ("prepreg", 0.11), ("core", 0.33), ("prepreg", 0.10)]
     cu = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"]
     L = ['    (stackup', '      (layer "F.SilkS" (type "Top Silk Screen") (color "White"))', '      (layer "F.Paste" (type "Top Solder Paste"))',
          '      (layer "F.Mask" (type "Top Solder Mask") (color "Black") (thickness 0.01))']

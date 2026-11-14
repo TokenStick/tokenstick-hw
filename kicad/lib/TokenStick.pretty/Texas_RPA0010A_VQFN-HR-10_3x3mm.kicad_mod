@@ -1,6 +1,6 @@
 (footprint "Texas_RPA0010A_VQFN-HR-10_3x3mm" (version 20221018) (generator tokenstick_gen)
   (layer "F.Cu")
-  (descr "TI RPA0010A VQFN-HR-10, 3x3 mm (TPS56637). Pad geometry to be verified against TI package drawing 4227016")
+  (descr "TI RPA0010A VQFN-HR-10, 3x3 mm (TPS56637). Pad dimensions match the values printed in the TI land pattern, datasheet p.32 (drawing 4224047/A); the drawing itself was only available as text, compare visually before ordering")
   (attr smd)
   (fp_text reference "REF**" (at 0 -2.6) (layer "F.SilkS") (effects (font (size 1 1) (thickness 0.15))))
   (fp_text value "Texas_RPA0010A_VQFN-HR-10_3x3mm" (at 0 2.6) (layer "F.Fab") (effects (font (size 1 1) (thickness 0.15))))

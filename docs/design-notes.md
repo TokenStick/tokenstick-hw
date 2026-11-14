@@ -250,3 +250,30 @@ KiCad (`kicad/tokenstick/`) is the source for fabrication. The Cherry Blossom pr
 4. Unique ID source for the USB serial number (chip OTP or a small EEPROM)
 
 All four hang on one I2C bus of the RK1828. Open before drawing: which RK1828 I2C pins and which IO voltage (not in the datasheet extract used so far), and whether the RK1828 OTP is readable by firmware.
+
+## 19. Work that does not depend on the RK1828 (2026-11-14)
+
+Drawing is frozen until Rockchip answers. These checks were done in the meantime.
+
+### Land patterns against the manufacturer drawings
+
+| Part | Source | Result |
+|---|---|---|
+| HD3SS3220 (RNH0030A) | TI datasheet p.41, drawing 4221819/B | TI: 30 pads 0.5 x 0.2 mm, 0.4 mm pitch, rows 2.4 and 4.4 mm apart, thermal pad 1.2 x 3.2 mm, pins 1-10 / 11-15 / 16-25 / 26-30. The footprint had 0.75 mm pads on rows 2.5 and 4.5 mm apart (KiCad library pattern). Rewritten to TI's values; the corner pads are 0.1 mm shorter than TI's to keep 0.15 mm between neighbours |
+| TPS56637 (RPA0010A) | TI datasheet p.32, drawing 4224047/A | Every dimension of the footprint appears in the TI land pattern (0.25 x 0.6 mm pads, 0.5 mm pitch, 2.8 mm row spacing, bars 0.4 x 2.1 and 0.25 x 1.7 mm, offsets 0.21, 0.37, 0.87, 0.93, 0.95 mm). The drawing was read as text only, so which number belongs to which feature is not proven; compare visually before ordering |
+| TPD4E05U06 (DQA) | TI datasheet, mechanical pages | The pages contain no extractable text. Not checked; the footprint follows the KiCad library pattern |
+
+The board was rebuilt with the new HD3SS3220 footprint; DRC is unchanged.
+
+### Stackup and impedance
+
+- JLCPCB's 6-layer impedance stackup uses a 0.10 mm prepreg (3313, dielectric constant 4.1) under 0.035 mm outer copper. Their published table covers 1.2, 1.6 and 2.0 mm together and its layer values add up to about 1.6 mm, so the core thicknesses of the 1.2 mm build are not confirmed
+- `kicad/tokenstick/impedance.py` (IPC-2141 microstrip formulas) with these values: 0.15 mm track with 0.15 mm gap gives about 89 ohm differential, a 0.15 mm single track about 50 ohm. The widths already drawn are therefore in range for 90 ohm USB pairs on the outer layers
+- Not covered: the USB 2.0 pair on inner layer 2 (needs the core thickness), the effect of the gold openings, and the fab's own calculator, which decides the final numbers
+
+### Documents
+
+- Project spec rewritten as draft v0.3 (pre-Rockchip state, solid versus assumed parts, open questions)
+- BOM sheet updated to the parts actually on the board (connector, mux, ESD arrays, load switch, 3.3 V LDO)
+
+ERC of the KiCad schematic is still open; it has to be run in the KiCad GUI.
