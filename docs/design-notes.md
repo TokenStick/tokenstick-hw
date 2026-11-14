@@ -115,3 +115,9 @@ A second attempt with the mux turned towards J1 connected 112 of 134. The limiti
 ### Logo
 
 "tokenstick" wordmark on the top side above the RK1828, 2.8 mm tall, as copper with a matching solder mask opening so it shows in ENIG gold on the black board. It uses the editor's stock font; the real logotype (with the USB-C glyph) has to be imported as a graphic in KiCad.
+
+### Logotype and J1 change (later the same day)
+
+- The stock-font wordmark was replaced by the real logotype (USB-C port glyph, "token" solid, "stick" fading, caret). Cherry Blossom drops footprint graphics, so the logotype is built from 296 rectangular copper pads without paste; pads get a solder mask opening, so it shows in ENIG gold. The fade is a horizontal line screen with 0.14 mm minimum line and gap. For KiCad the same artwork is in `kicad/lib/TokenStick.pretty/TokenStick_Logotype.kicad_mod` as F.Cu and F.Mask polygons; generators are in `kicad/lib/logo/`.
+- J1 changed from the dual-row SMD receptacle to Amphenol 12401610E4#2A (LCSC C5119948, hybrid SMD and through-hole, USB 3.2 Gen 2). Shield pins tied to GND.
+- A third autoroute attempt connected 113 of 133. The open connections are now around the HD3SS3220 and the ESD parts rather than at J1. The SuperSpeed section will be routed by hand in KiCad as differential pairs; the autorouter is not suited to it.
