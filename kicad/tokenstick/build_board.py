@@ -271,9 +271,11 @@ def build():
     autoroute.run(b, net, sys.modules[__name__])
 
     gold_traces(b)
-    for txt, x, y in (("USB DATA", -31.0, -7.6), ("RK1828", -12.0, -11.0), ("5V BUCK", 13.6, 4.4), ("LOAD SWITCH", 28.15, 2.6), ("USB PD", 28.0, -15.4), ("PWR IN", 37.0, 6.4), ("DATA", -38.5, 6.4)):
+    titles = (("USB DATA", -34.0, -9.2), ("RK1828", -12.0, -11.2), ("5V BUCK", 13.6, 5.2), ("LOAD SWITCH", 28.15, 3.4), ("USB PD", 27.0, -15.9), ("PWR IN", 38.0, 6.6), ("DATA", -38.0, 6.6))
+    for txt, x, y in titles:
         t = pcbnew.PCB_TEXT(b); t.SetText(txt); t.SetLayer(pcbnew.F_SilkS); t.SetPosition(P(x, y))
         t.SetTextSize(pcbnew.VECTOR2I(mm(0.9), mm(0.9))); t.SetTextThickness(mm(0.15)); b.Add(t)
+    tidy_silk(b, titles)
     r = pcbnew.PCB_SHAPE(b); r.SetShape(pcbnew.SHAPE_T_RECT); r.SetLayer(pcbnew.Dwgs_User); r.SetWidth(mm(0.15))
     r.SetStart(P(-1.0, 16.5)); r.SetEnd(P(6.6, -16.5)); b.Add(r)
     t = pcbnew.PCB_TEXT(b); t.SetText("reserved: RK1828 regulators"); t.SetLayer(pcbnew.Dwgs_User); t.SetPosition(P(2.9, 0)); t.SetTextAngleDegrees(90)
@@ -287,6 +289,51 @@ def build():
         z.SetLocalClearance(mm(0.15)); z.SetMinThickness(mm(0.15)); z.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL)
         b.Add(z)
     return b
+
+
+SILK_H = 0.6
+
+
+def tidy_silk(b, titles):
+    """Put every reference designator next to its part where there is free room; hide it otherwise."""
+    def box_of(bb_, grow=0.0):
+        return (pcbnew.ToMM(bb_.GetLeft()) - grow, pcbnew.ToMM(bb_.GetRight()) + grow, pcbnew.ToMM(bb_.GetTop()) - grow, pcbnew.ToMM(bb_.GetBottom()) + grow)
+    hit = lambda a, c: a[0] < c[1] and c[0] < a[1] and a[2] < c[3] and c[2] < a[3]
+    fixed, court = [], {}
+    for fp in b.GetFootprints():
+        ref = fp.GetReference()
+        xs, ys = [], []
+        for pad in fp.Pads():
+            bx = box_of(pad.GetBoundingBox(), 0.12); fixed.append(bx); xs += bx[:2]; ys += bx[2:]
+        for g in fp.GraphicalItems():
+            if g.GetLayer() in (pcbnew.F_CrtYd, pcbnew.F_Fab) and g.Type() == pcbnew.PCB_SHAPE_T:
+                bx = box_of(g.GetBoundingBox()); xs += bx[:2]; ys += bx[2:]
+        if not xs:
+            bx = box_of(fp.GetBoundingBox(False, False)); xs, ys = list(bx[:2]), list(bx[2:])
+        court[ref] = (min(xs), max(xs), min(ys), max(ys))
+    for txt, x, y in titles:
+        w = 0.9 * 0.95 * len(txt)
+        fixed.append((OX + x - w / 2 - 0.2, OX + x + w / 2 + 0.2, OY - y - 0.65, OY - y + 0.65))
+    edge = (OX - W / 2 + 0.6, OX + W / 2 - 0.6, OY - H / 2 + 0.6, OY + H / 2 - 0.6)
+    placed, hidden = [], []
+    for fp in sorted(b.GetFootprints(), key=lambda f: -(court[f.GetReference()][1] - court[f.GetReference()][0]) * (court[f.GetReference()][3] - court[f.GetReference()][2])):
+        ref = fp.GetReference(); t = fp.Reference()
+        if ref in ("LG1", "U1"): t.SetVisible(False); continue
+        c = court[ref]; w = SILK_H * 0.95 * len(ref); h = SILK_H; g = 0.35
+        cx_, cy_ = (c[0] + c[1]) / 2, (c[2] + c[3]) / 2
+        cands = [(cx_, c[2] - g - h / 2), (cx_, c[3] + g + h / 2), (c[1] + g + w / 2, cy_), (c[0] - g - w / 2, cy_),
+                 (c[1] + g + w / 2, c[2] + h / 2), (c[0] - g - w / 2, c[2] + h / 2), (c[1] + g + w / 2, c[3] - h / 2), (c[0] - g - w / 2, c[3] - h / 2)]
+        for x, y in cands:
+            bx = (x - w / 2 - 0.08, x + w / 2 + 0.08, y - h / 2 - 0.08, y + h / 2 + 0.08)
+            if bx[0] < edge[0] or bx[1] > edge[1] or bx[2] < edge[2] or bx[3] > edge[3]: continue
+            if any(hit(bx, f) for f in fixed) or any(hit(bx, f) for f in placed): continue
+            if any(hit(bx, v) for k, v in court.items() if k != ref): continue
+            t.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y))); t.SetTextAngleDegrees(0); t.SetVisible(True); t.SetLayer(pcbnew.F_SilkS)
+            t.SetTextSize(pcbnew.VECTOR2I(mm(SILK_H), mm(SILK_H))); t.SetTextThickness(mm(0.1)); t.SetKeepUpright(True)
+            placed.append(bx); break
+        else:
+            t.SetVisible(False); hidden.append(ref)
+    print("silkscreen: %d designators placed, hidden: %s" % (len(placed), " ".join(sorted(hidden)) or "none"))
 
 
 GOLD_PAD_DISTANCE = 0.6     # solder mask stays closed this close to any pad, so solder cannot run along a bare track

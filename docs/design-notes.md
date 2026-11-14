@@ -144,7 +144,7 @@ DRC result: no clearance or short errors, all routed USB nets connected. Remaini
 Corrections and findings from this step:
 
 - The Amphenol 12401610E4#2A has two SMD signal rows; only the shell is through-hole. The earlier note calling one signal row through-hole was wrong. The fan-out still works by hand as described above
-- The HD3SS3220 footprint in the KiCad library (10 + 5 + 10 + 5 pads) differs from the EasyEDA land used in Cherry Blossom. The KiCad arrangement is used here; verify against the TI datasheet land pattern before ordering
+- The HD3SS3220 footprint follows the KiCad library pattern (10 + 5 + 10 + 5 pads). An earlier version of this note said it differs from the EasyEDA land used in Cherry Blossom; that was a misreading, both have the same pad arrangement. Still verify against the TI datasheet land pattern before ordering
 - The 3V3 net (mux supply, DIR pull-up) has no source in the schematic. A 3.3 V regulator is missing
 - The TPS56637 footprint was written from the TI package drawing dimensions and is not verified
 - L1 is now a 5 x 5 mm footprint (Coilcraft XAL5030 class), which pushed the buck placement to the right of the RK1828
@@ -207,3 +207,10 @@ The board is now laid out along its long axis in the direction of power and sign
 - Block names are on the silkscreen. Reference designators still overlap in places; silkscreen clean-up is not done
 
 DRC is unchanged: clean apart from the RK1828 pins that are not designed and C16 inside the RK1828 courtyard.
+
+## 15. Silkscreen clean-up (2026-11-14)
+
+- Reference designators are placed by `tidy_silk()` in `build_board.py`: 0.6 mm text next to the part, in the first position that is clear of pads, other parts, other text, the block names and the board edge
+- 42 designators placed; C15, C7, R5 and R8 have no free position and are hidden on the silkscreen (they remain in the fabrication layer and the position file)
+- The RK1828 and the logotype carry no designator
+- KiCad warns that 0.6 mm text is below its default minimum of 0.8 mm; most fabs print 0.6 mm at 0.1 mm line width, confirm with the chosen fab
