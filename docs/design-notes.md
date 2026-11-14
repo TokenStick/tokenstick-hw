@@ -277,3 +277,14 @@ The board was rebuilt with the new HD3SS3220 footprint; DRC is unchanged.
 - BOM sheet updated to the parts actually on the board (connector, mux, ESD arrays, load switch, 3.3 V LDO)
 
 ERC of the KiCad schematic is still open; it has to be run in the KiCad GUI.
+
+## 20. Cherry Blossom board fully routed (2026-11-14)
+
+The Cherry Blossom copy is now routed completely (no open connections in its checks):
+
+- The 54 hand-defined USB tracks and 21 vias of the KiCad board were drawn into Cherry Blossom at the same coordinates and locked
+- Seven further tracks were drawn by hand where its autorouter had no way through: PD CC1 and CC2 (via, bottom layer, via), the boot strap resistor, the VIN feed of the EN divider, three ground vias
+- Everything else was routed by Cherry Blossom's autorouter around the locked tracks. Ground pours were added on inner layers 1 and 4, as in KiCad
+- Design rules in Cherry Blossom were set to the KiCad values (0.1 mm clearance and minimum width, 0.45/0.2 mm vias)
+
+Differences that remain: no copper areas for the power nets and no gold openings; the non-USB routing differs from KiCad track by track; J1 hangs over the board edge and two courtyard overlaps are reported (J2/D1, Q1/Q2) because the supplier footprints are larger than the KiCad ones; the RK1828 ground balls are joined by top-layer tracks, which is not an acceptable fan-out. KiCad stays the source for fabrication.
