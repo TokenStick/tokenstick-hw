@@ -20,7 +20,7 @@
   (fp_line (start -9.610 -8.110) (end -9.610 -9.010) (stroke (width 0.12) (type solid)) (layer "F.SilkS"))
   (fp_line (start -9.010 -9.610) (end -8.110 -9.610) (stroke (width 0.12) (type solid)) (layer "F.SilkS"))
   (fp_circle (center -10.110 -10.110) (end -9.910 -10.110) (stroke (width 0.2) (type solid)) (fill solid) (layer "F.SilkS"))
-  (fp_rect (start -10.50 -10.50) (end 10.50 10.50) (stroke (width 0.05) (type solid)) (fill none) (layer "F.CrtYd"))
+  (fp_rect (start -10.00 -10.00) (end 10.00 10.00) (stroke (width 0.05) (type solid)) (fill none) (layer "F.CrtYd"))
   (pad "A1" smd circle (at -8.775 -8.775) (size 0.3 0.3) (layers "F.Cu" "F.Paste" "F.Mask"))
   (pad "A2" smd circle (at -8.125 -8.775) (size 0.3 0.3) (layers "F.Cu" "F.Paste" "F.Mask"))
   (pad "A3" smd circle (at -7.475 -8.775) (size 0.3 0.3) (layers "F.Cu" "F.Paste" "F.Mask"))

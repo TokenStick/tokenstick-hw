@@ -41,7 +41,7 @@ RK1820 (2.5 GB DRAM) uses the same package and is a possible lower-cost variant.
 ### PD POWER INPUT
 - 16-pin USB-C receptacle (power only), STUSB4500 standalone PD sink, two AON7403 P-channel FETs (30 V) back to back as the VBUS switch, 24 V TVS
 - Output net VIN, 9-20 V after negotiation
-- The STUSB4500 NVM must be programmed with the wanted profiles. I2C is pulled up but no programming header exists yet
+- The STUSB4500 NVM must be programmed with the wanted profiles (see `stusb4500-nvm.md`). I2C is pulled up and reachable on the test points SCL and SDA
 
 ### 5V BUCK
 - TPS56637 (6 A), 3.3 uH, 4 x 22 uF output, feedback 73.2k / 10k for 5 V, power-good on 5V_PG
@@ -288,3 +288,27 @@ The Cherry Blossom copy is now routed completely (no open connections in its che
 - Design rules in Cherry Blossom were set to the KiCad values (0.1 mm clearance and minimum width, 0.45/0.2 mm vias)
 
 Differences that remain: no copper areas for the power nets and no gold openings; the non-USB routing differs from KiCad track by track; J1 hangs over the board edge and two courtyard overlaps are reported (J2/D1, Q1/Q2) because the supplier footprints are larger than the KiCad ones; the RK1828 ground balls are joined by top-layer tracks, which is not an acceptable fan-out. KiCad stays the source for fabrication.
+
+## 21. DRC items closed, test points, fiducials, PD NVM plan (2026-11-14)
+
+Work that does not depend on the RK1828.
+
+DRC:
+
+- J1 VBUS: the A4/B9 pin pair was an island. It now has its own via and is joined to the A9/B4 pair on inner layer 3, passing round the D+ via. This is the first track on that layer
+- C16 and the RK1828 courtyard: the courtyard of the RK1828 footprint was reduced from 1.0 mm to 0.5 mm around the package (the smallest value IPC-7351 uses for BGAs) and C15/C16 moved 0.1 mm away from the package. C16 is now 0.7 mm from the package body. If rework access matters more than density, the capacitors have to move next to the mux instead
+- Solder mask bridge errors came from the logotype (bare copper shapes inside one footprint); bridges inside a footprint are now allowed in the board setup
+- Footprints carry their library name, so KiCad no longer reports them as unknown. The command-line check here still warns because it has no global library table
+- Silkscreen text is 0.8 mm high (was 0.6 mm, below KiCad's default limit). Designators are placed using their real extent and avoid pads, bare tracks and footprint outlines; they may sit up to 1.4 mm from the part or be turned by 90 degrees. 38 are placed, 14 are hidden (C1 C2 C6 C7 C9 C13 C15 C16 R5 R6 R8 R11 R14 R15)
+- The report now contains no errors apart from the 365 RK1828 ground balls. Warnings left: 3 copper slivers in the power areas, 3 silkscreen overlaps, 2 silkscreen lines of the RK1828 outline over bare tracks
+
+Added:
+
+- Six test points, 1 mm square pads labelled with the net: VIN, 5V, 3V3, GND, SCL, SDA. SCL and SDA are the I2C lines of the PD controller and are needed to program its NVM
+- Three fiducials (1 mm copper, 2 mm mask opening) in three corners
+- R5 is now the SDA pull-up and R6 the SCL pull-up (exchanged), so both lines run straight from the chip to their resistor without crossing
+- No mounting holes: they depend on the enclosure, which is not designed
+
+`stusb4500-nvm.md` lists the NVM settings. Voltages and switch behaviour are fixed there; the profile currents are provisional until the power budget is known.
+
+The Cherry Blossom copy does not have these changes yet.

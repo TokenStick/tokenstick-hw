@@ -16,7 +16,7 @@ R1,PD POWER INPUT,Resistor,470,0402,Checked vs datasheet,VBUS_VS_DISCH
 R2,PD POWER INPUT,Resistor,1k,0402,Checked vs datasheet,DISCH
 R3,PD POWER INPUT,Resistor,22k,0402,Checked vs datasheet,Gate drive
 R4,PD POWER INPUT,Resistor,100k,0402,Checked vs datasheet,Gate to common source
-R5-R6,PD POWER INPUT,Resistor,10k,0402,OK,I2C pull-ups
+R5-R6,PD POWER INPUT,Resistor,10k,0402,OK,I2C pull-ups (R5 SDA; R6 SCL)
 C1,PD POWER INPUT,Capacitor,100nF,0402,Checked vs datasheet,Gate soft-start
 C2-C3,PD POWER INPUT,Capacitor,1uF,0402,OK,VREG_2V7 and VREG_1V2
 C4,PD POWER INPUT,Capacitor,1uF 50V,0603,OK,VBUS
@@ -32,3 +32,5 @@ R10,5V BUCK,Resistor,100k,0402,OK,Power-good pull-up
 R11,5V BUCK,Resistor,169k,0402,Checked vs datasheet,EN divider top
 R14,5V BUCK,Resistor,36.1k,0402,Checked vs datasheet,EN divider bottom
 R12,5V BUCK,Resistor,10k,0402,Checked vs datasheet,MODE to GND selects Eco-mode; leave open for FCCM
+TP1-TP6,TEST,Test point (no part),,1 mm pad,OK,VIN 5V 3V3 GND SCL SDA; SCL and SDA program the STUSB4500 NVM
+FID1-FID3,TEST,Fiducial (no part),,1 mm copper,OK,Three corners

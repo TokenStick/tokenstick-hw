@@ -62,6 +62,7 @@ def run(board, net, cfg):
                 pads.setdefault(name, []).append((ref, pad.GetNumber(), pcbnew.ToMM(p.x) - OX, OY - pcbnew.ToMM(p.y), box, th))
     lay = {"F.Cu": [F], "B.Cu": [B], "In2.Cu": [I]}
     for name, layer, w, pts in cfg.TRACKS:
+        if layer not in lay: continue          # other inner layers are not used by this router; their vias are in cfg.VIAS
         for a, c in zip(pts, pts[1:]): seg(lay[layer], *a, *c, w, nid(name))
     holes = np.zeros((1, NY, NX), dtype=bool)        # keep-out around every via hole, same net included
     for name, x, y in cfg.VIAS:
@@ -172,7 +173,7 @@ def run(board, net, cfg):
             if z[0] == name: rect([F], *z[1:], True, arr=tree)
         for tn, layer, tw, pts in cfg.TRACKS:
             if tn == name:
-                for a, c in zip(pts, pts[1:]): seg(lay[layer][:1] if layer != "In2.Cu" else [], *a, *c, tw, True, arr=tree)
+                for a, c in zip(pts, pts[1:]): seg(lay[layer][:1] if layer in ("F.Cu", "B.Cu") else [], *a, *c, tw, True, arr=tree)
         for vn, vx, vy in cfg.VIAS:
             if vn == name: seg([F, B], vx, vy, vx, vy, cfg.VIA_D, True, arr=tree)
         if not tree.any():

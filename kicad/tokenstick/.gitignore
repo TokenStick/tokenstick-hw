@@ -3,3 +3,4 @@ drc.rpt
 *.kicad_prl
 fp-info-cache
 fr_*.kicad_pcb
+__pycache__/

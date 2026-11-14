@@ -28,6 +28,7 @@ def P(x, y):
 K = lambda lib: os.path.join(KLIB, lib + ".pretty")
 C0402, R0402 = (K("Capacitor_SMD"), "C_0402_1005Metric"), (K("Resistor_SMD"), "R_0402_1005Metric")
 C0603, C0805 = (K("Capacitor_SMD"), "C_0603_1608Metric"), (K("Capacitor_SMD"), "C_0805_2012Metric")
+TP, FID = (K("TestPoint"), "TestPoint_Pad_1.0x1.0mm"), (K("Fiducial"), "Fiducial_1mm_Mask2mm")
 DFN8 = (K("Package_DFN_QFN"), "DFN-8-1EP_3x3mm_P0.65mm_EP1.55x2.4mm")
 PARTS = {
     # USB-C data side
@@ -35,8 +36,8 @@ PARTS = {
     "U4": (LIB, "USON-10_2.5x1.0mm_P0.5mm", "TPD4E05U06DQA", -29.5, 3.0, 0),
     "U5": (LIB, "USON-10_2.5x1.0mm_P0.5mm", "TPD4E05U06DQA", -29.5, -3.0, 0),
     "U3": (LIB, "Texas_RNH0030A_WQFN-30-1EP_2.5x4.5mm_P0.4mm_EP1.2x3.2mm", "HD3SS3220RNH", -26.0, -3.4, 180),
-    "C15": (*C0402, "100nF", -23.4, -6.0, 90),
-    "C16": (*C0402, "100nF", -22.4, -4.6, 90),
+    "C15": (*C0402, "100nF", -23.5, -6.0, 90),
+    "C16": (*C0402, "100nF", -22.5, -4.6, 90),
     "C7": (*C0402, "100nF", -24.2, 0.5, 90),
     "C8": (*C0402, "100nF", -27.7, -7.0, 0),
     "R7": (*R0402, "900k", -25.0, -6.9, 0),
@@ -69,7 +70,12 @@ PARTS = {
     "R5": (*R0402, "10k", 29.05, -5.6, 270), "R6": (*R0402, "10k", 30.1, -5.6, 270),
     "C1": (*C0402, "100nF", 28.15, -3.8, 0), "C2": (*C0402, "1uF", 28.75, -13.2, 270),
     "C3": (*C0402, "1uF", 27.75, -13.2, 270), "C4": (*C0603, "1uF 50V", 32.2, -12.6, 0),
+    # test points (value = net, printed on the silkscreen) and fiducials
+    "TP1": (*TP, "VIN", 21.6, 5.2, 0), "TP2": (*TP, "5V", 19.8, -8.6, 0), "TP3": (*TP, "3V3", -28.2, 10.4, 0),
+    "TP4": (*TP, "GND", 8.6, 5.6, 0), "TP5": (*TP, "SCL", 35.4, -7.6, 0), "TP6": (*TP, "SDA", 35.4, -9.8, 0),
+    "FID1": (*FID, "Fiducial", -40.0, -15.0, 0), "FID2": (*FID, "Fiducial", 40.0, -15.0, 0), "FID3": (*FID, "Fiducial", 40.0, 15.0, 0),
 }
+NO_SCHEMATIC = {"LG1", "FID1", "FID2", "FID3"}
 
 # ---------------------------------------------------------------- netlist
 # Polarity note: lane 1 (J1 A2/A3 and B11/B10) is connected to the mux with P and N exchanged.
@@ -77,7 +83,7 @@ PARTS = {
 # without crossing the pair. USB 3.x receivers must detect and correct lane polarity inversion.
 NETS = {
     "GND": "J1.A1 J1.A12 J1.B1 J1.B12 J1.S1 U3.4 U3.12 U3.13 U3.28 U3.29 U3.31 U4.3 U4.8 U5.3 U5.8 C7.2 C8.2 R13.2 U7.2 C18.2 C19.2 "
-           "J2.A1 J2.A12 J2.B1 J2.B12 J2.S1 U2.6 U2.10 U2.12 U2.13 U2.22 U2.25 D1.2 C2.2 C3.2 C4.2 C5.2 C6.2 "
+           "J2.A1 J2.A12 J2.B1 J2.B12 J2.S1 U2.6 U2.10 U2.12 U2.13 U2.22 U2.25 D1.2 C2.2 C3.2 C4.2 C5.2 C6.2 TP4.1 "
            "U6.3 U6.9 C9.2 C10.2 C12.2 C13.2 C14.2 C17.2 R9.2 R12.2 R14.2",
     "VBUS_DATA": "J1.A4 J1.A9 J1.B4 J1.B9 R7.1",
     "DATA_CC1": "J1.A5 U3.2", "DATA_CC2": "J1.B5 U3.1",
@@ -90,14 +96,14 @@ NETS = {
     "Net-(C15-1)": "C15.1 U1.AE1", "Net-(C16-1)": "C16.1 U1.AE2",
     "USB_SSRX_P": "U3.9 U1.AF2", "USB_SSRX_N": "U3.10 U1.AG1",
     "USB_DIR": "U3.11 R15.1", "Net-(R7-2)": "R7.2 U3.5", "Net-(R13-1)": "R13.1 U1.W1",
-    "3V3": "U3.8 C7.1 R15.2 U7.5 C19.1",
-    "5V": "U7.1 U7.3 C18.1 U3.30 C8.1 L1.2 C12.1 C13.1 C14.1 C17.1 R8.1 R10.1",
-    "VIN": "Q1.5 Q1.6 Q1.7 Q1.8 Q1.9 R2.1 C5.1 C6.1 U6.8 C9.1 C10.1 R11.1",
+    "3V3": "U3.8 C7.1 R15.2 U7.5 C19.1 TP3.1",
+    "5V": "U7.1 U7.3 C18.1 U3.30 C8.1 L1.2 C12.1 C13.1 C14.1 C17.1 R8.1 R10.1 TP2.1",
+    "VIN": "Q1.5 Q1.6 Q1.7 Q1.8 Q1.9 R2.1 C5.1 C6.1 U6.8 C9.1 C10.1 R11.1 TP1.1",
     "VBUS_PD": "J2.A4 J2.A9 J2.B4 J2.B9 Q2.5 Q2.6 Q2.7 Q2.8 Q2.9 U2.24 D1.1 R1.1 C4.1",
     "PD_SRC": "Q1.1 Q1.2 Q1.3 Q2.1 Q2.2 Q2.3 R4.1 C1.1",
     "PD_GATE": "Q1.4 Q2.4 R3.1 R4.2 C1.2",
     "PD_CC1": "J2.A5 U2.1 U2.2", "PD_CC2": "J2.B5 U2.4 U2.5",
-    "PD_SCL": "U2.7 R5.2", "PD_SDA": "U2.8 R6.2", "VREG_2V7": "U2.23 C2.1 R5.1 R6.1",
+    "PD_SCL": "U2.7 R6.2 TP5.1", "PD_SDA": "U2.8 R5.2 TP6.1", "VREG_2V7": "U2.23 C2.1 R5.1 R6.1",
     "U2_VREG_1V2": "U2.21 C3.1", "Net-(R1-2)": "R1.2 U2.18", "Net-(R2-2)": "R2.2 U2.9", "Net-(R3-2)": "R3.2 U2.16",
     "BUCK_SW": "U6.6 L1.1 C11.2", "Net-(C11-1)": "C11.1 U6.7", "BUCK_FB": "U6.2 R8.2 R9.1",
     "BUCK_EN": "U6.1 R11.2 R14.1", "5V_PG": "U6.4 R10.2", "Net-(R12-1)": "U6.10 R12.1",
@@ -134,11 +140,11 @@ TRACKS = [  # (net, layer, width, [points])
     ("C_TX2_N", "F.Cu", SS, [(-29.115, -3.5), (-28.7, -3.5), (-28.4, -3.2), (-27.25, -3.2)]),
     ("C_TX2_P", "F.Cu", SS, [(-29.115, -4.0), (-28.7, -4.0), (-28.3, -3.6), (-27.25, -3.6)]),
     # mux to the AC coupling capacitors and the RK1828 transmit balls, top layer
-    ("USB_SSTX_N", "F.Cu", SS, [(-24.75, -2.8), (-22.7, -2.8), (-22.4, -3.1), (-22.4, -4.12)]),
-    ("USB_SSTX_P", "F.Cu", SS, [(-24.75, -3.2), (-23.7, -3.2), (-23.4, -3.5), (-23.4, -5.52)]),
-    ("Net-(C16-1)", "F.Cu", SS, [(-22.4, -5.08), (-22.4, -6.25), (-22.15, -6.5), (-21.6, -6.5)]),
+    ("USB_SSTX_N", "F.Cu", SS, [(-24.75, -2.8), (-22.8, -2.8), (-22.5, -3.1), (-22.5, -4.12)]),
+    ("USB_SSTX_P", "F.Cu", SS, [(-24.75, -3.2), (-23.8, -3.2), (-23.5, -3.5), (-23.5, -5.52)]),
+    ("Net-(C16-1)", "F.Cu", SS, [(-22.5, -5.08), (-22.5, -6.25), (-22.25, -6.5), (-21.6, -6.5)]),
     ("Net-(C16-1)", "F.Cu", BGA, [(-21.6, -6.5), (-20.45, -6.5), (-20.125, -6.825)]),
-    ("Net-(C15-1)", "F.Cu", SS, [(-23.4, -6.48), (-23.4, -6.6), (-23.175, -6.825), (-21.6, -6.825)]),
+    ("Net-(C15-1)", "F.Cu", SS, [(-23.5, -6.48), (-23.5, -6.6), (-23.275, -6.825), (-21.6, -6.825)]),
     ("Net-(C15-1)", "F.Cu", BGA, [(-21.6, -6.825), (-20.775, -6.825)]),
     # mux receive pair: crosses under the transmit pair on the bottom layer
     ("USB_SSRX_N", "F.Cu", SS, [(-24.65, -1.6), (-23.9, -1.6), (-23.8, -1.5), (-22.7, -1.5), (-22.6, -1.6)]),
@@ -186,6 +192,8 @@ TRACKS += [  # common source of the back-to-back FETs, switch node stub
     ("VBUS_DATA", "F.Cu", SS, [(-32.48, -1.25), (-31.0, -1.25)]),
     ("VBUS_DATA", "F.Cu", SS, [(-34.18, -1.0), (-33.2, -1.0), (-32.95, -1.25), (-32.48, -1.25)]),
     ("VBUS_DATA", "F.Cu", SS, [(-34.18, 1.5), (-33.1, 1.5), (-32.85, 1.25), (-32.48, 1.25)]),
+    ("VBUS_DATA", "F.Cu", SS, [(-32.48, 1.25), (-31.0, 1.25)]),      # A4/B9 pair to a via, then round the D+ via on inner layer 3
+    ("VBUS_DATA", "In3.Cu", 0.2, [(-31.0, 1.25), (-30.4, 0.65), (-30.4, -0.65), (-31.0, -1.25)]),
 ]
 ZONES = [  # copper areas on the top layer: (net, xmin, xmax, ymin, ymax)
     ("VIN", 14.3, 26.68, -1.2, 1.2),
@@ -195,9 +203,14 @@ ZONES = [  # copper areas on the top layer: (net, xmin, xmax, ymin, ymax)
 ]
 POWER_NETS = {"VBUS_PD", "PD_SRC", "VIN", "BUCK_SW", "5V", "3V3"}
 POWER_REFS = {"J2", "Q1", "Q2", "U6", "L1", "C5", "C6", "C9", "C10", "C12", "C13", "C14", "C17", "U7", "C18", "C19"}   # pads that carry load current
-VIAS += [("3V3", -23.9, -2.4), ("VBUS_DATA", -31.0, -1.25), ("Net-(R7-2)", -23.95, -4.1)]
+TRACKS += [  # I2C pins of the PD controller straight up to their pull-ups (R5 = SDA, R6 = SCL, so the two do not cross)
+    ("PD_SDA", "F.Cu", 0.2, [(28.75, -7.56), (28.75, -6.75), (29.05, -6.45), (29.05, -6.11)]),
+    ("PD_SCL", "F.Cu", 0.2, [(29.25, -7.56), (29.25, -7.0), (29.85, -6.4), (30.1, -6.15), (30.1, -6.11)]),
+]
+VIAS += [("PD_SDA", 28.75, -6.9)]      # way out to the bottom layer for the SDA test point
+VIAS += [("3V3", -23.9, -2.4), ("VBUS_DATA", -31.0, -1.25), ("VBUS_DATA", -31.0, 1.25), ("Net-(R7-2)", -23.95, -4.1)]
 ROUTE_FIRST = ["VBUS_DATA", "Net-(R7-2)", "3V3"]      # short nets in the crowded USB corner
-HAND_ROUTED = {t[0] for t in TRACKS} - {"PD_SRC", "BUCK_SW", "3V3", "VBUS_DATA", "Net-(R7-2)"}
+HAND_ROUTED = {t[0] for t in TRACKS} - {"PD_SRC", "BUCK_SW", "3V3", "VBUS_DATA", "Net-(R7-2)", "PD_SCL", "PD_SDA"}
 
 
 def build(hand=True, auto=True):
@@ -207,6 +220,7 @@ def build(hand=True, auto=True):
     ds = b.GetDesignSettings()
     ds.m_MinClearance = mm(0.1); ds.m_TrackMinWidth = mm(0.1); ds.m_ViasMinSize = mm(0.45)
     ds.m_MinThroughDrill = mm(0.2); ds.m_ViasMinAnnularWidth = mm(0.1); ds.m_CopperEdgeClearance = mm(0.25)
+    ds.m_AllowSoldermaskBridgesInFPs = True      # the logotype is bare copper inside one footprint
     ds.m_HoleClearance = mm(0.15); ds.m_HoleToHoleMin = mm(0.25); ds.SetBoardThickness(mm(1.2))
     nc = ds.m_NetSettings.m_DefaultNetClass
     nc.SetClearance(mm(0.1)); nc.SetTrackWidth(mm(0.15)); nc.SetViaDiameter(mm(VIA_D)); nc.SetViaDrill(mm(VIA_DRILL))
@@ -244,6 +258,7 @@ def build(hand=True, auto=True):
     for ref, (lib, fpname, value, x, y, rot) in PARTS.items():
         fp = pcbnew.FootprintLoad(lib, fpname)
         assert fp is not None, (lib, fpname)
+        fp.SetFPID(pcbnew.LIB_ID("TokenStick" if lib == LIB else os.path.basename(lib)[:-7], fpname))
         fp.SetReference(ref); fp.SetValue(value); fp.SetPosition(P(x, y)); fp.SetOrientationDegrees(rot)
         if ref in ("U1", "LG1"): fp.Reference().SetVisible(False)
         for pad in fp.Pads():
@@ -293,7 +308,7 @@ def build(hand=True, auto=True):
     return b
 
 
-SILK_H = 0.6
+SILK_H = 0.8
 
 
 def tidy_silk(b, titles):
@@ -310,9 +325,16 @@ def tidy_silk(b, titles):
         for g in fp.GraphicalItems():
             if g.GetLayer() in (pcbnew.F_CrtYd, pcbnew.F_Fab) and g.Type() == pcbnew.PCB_SHAPE_T:
                 bx = box_of(g.GetBoundingBox()); xs += bx[:2]; ys += bx[2:]
+            if g.GetLayer() == pcbnew.F_SilkS and g.Type() == pcbnew.PCB_SHAPE_T: fixed.append(box_of(g.GetBoundingBox(), 0.1))
         if not xs:
             bx = box_of(fp.GetBoundingBox(False, False)); xs, ys = list(bx[:2]), list(bx[2:])
         court[ref] = (min(xs), max(xs), min(ys), max(ys))
+    for d in b.GetDrawings():          # bare (gold) tracks: silkscreen ink is removed over mask openings
+        if d.GetLayer() == pcbnew.F_Mask and d.Type() == pcbnew.PCB_SHAPE_T:
+            s_, e_ = d.GetStart(), d.GetEnd(); n = max(1, int(pcbnew.ToMM(max(abs(e_.x - s_.x), abs(e_.y - s_.y))) / 0.3))
+            for i in range(n + 1):
+                x = pcbnew.ToMM(s_.x + (e_.x - s_.x) * i / n); y = pcbnew.ToMM(s_.y + (e_.y - s_.y) * i / n); r = pcbnew.ToMM(d.GetWidth()) / 2 + 0.05
+                fixed.append((x - r, x + r, y - r, y + r))
     for txt, x, y in titles:
         w = 0.9 * 0.95 * len(txt)
         fixed.append((OX + x - w / 2 - 0.2, OX + x + w / 2 + 0.2, OY - y - 0.65, OY - y + 0.65))
@@ -320,18 +342,24 @@ def tidy_silk(b, titles):
     placed, hidden = [], []
     for fp in sorted(b.GetFootprints(), key=lambda f: -(court[f.GetReference()][1] - court[f.GetReference()][0]) * (court[f.GetReference()][3] - court[f.GetReference()][2])):
         ref = fp.GetReference(); t = fp.Reference()
-        if ref in ("LG1", "U1"): t.SetVisible(False); continue
-        c = court[ref]; w = SILK_H * 0.95 * len(ref); h = SILK_H; g = 0.35
+        if ref in ("LG1", "U1") or ref.startswith("FID"): t.SetVisible(False); continue
+        if ref.startswith("TP"): t.SetVisible(False); t = fp.Value()      # a test point shows its net, not its designator
+        c = court[ref]; n = len(t.GetText())
         cx_, cy_ = (c[0] + c[1]) / 2, (c[2] + c[3]) / 2
-        cands = [(cx_, c[2] - g - h / 2), (cx_, c[3] + g + h / 2), (c[1] + g + w / 2, cy_), (c[0] - g - w / 2, cy_),
-                 (c[1] + g + w / 2, c[2] + h / 2), (c[0] - g - w / 2, c[2] + h / 2), (c[1] + g + w / 2, c[3] - h / 2), (c[0] - g - w / 2, c[3] - h / 2)]
-        for x, y in cands:
-            bx = (x - w / 2 - 0.08, x + w / 2 + 0.08, y - h / 2 - 0.08, y + h / 2 + 0.08)
+        cands = []                       # (x, y, angle): next to the part first, then further out, horizontal before vertical
+        for g in (0.3, 0.8, 1.4):
+            for ang in (0, 90):
+                w, h = (SILK_H * 0.95 * n, SILK_H) if ang == 0 else (SILK_H, SILK_H * 0.95 * n)
+                cands += [(cx_, c[2] - g - h / 2, ang), (cx_, c[3] + g + h / 2, ang), (c[1] + g + w / 2, cy_, ang), (c[0] - g - w / 2, cy_, ang),
+                          (c[1] + g + w / 2, c[2] + h / 2, ang), (c[0] - g - w / 2, c[2] + h / 2, ang), (c[1] + g + w / 2, c[3] - h / 2, ang), (c[0] - g - w / 2, c[3] - h / 2, ang)]
+        t.SetVisible(True); t.SetLayer(pcbnew.F_SilkS); t.SetKeepUpright(True)
+        t.SetTextSize(pcbnew.VECTOR2I(mm(SILK_H), mm(SILK_H))); t.SetTextThickness(mm(0.12))
+        for x, y, ang in cands:
+            t.SetTextAngleDegrees(ang); t.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y)))
+            bx = box_of(t.GetBoundingBox(), 0.1)          # the real extent of the text, plus the silkscreen clearance
             if bx[0] < edge[0] or bx[1] > edge[1] or bx[2] < edge[2] or bx[3] > edge[3]: continue
             if any(hit(bx, f) for f in fixed) or any(hit(bx, f) for f in placed): continue
             if any(hit(bx, v) for k, v in court.items() if k != ref): continue
-            t.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y))); t.SetTextAngleDegrees(0); t.SetVisible(True); t.SetLayer(pcbnew.F_SilkS)
-            t.SetTextSize(pcbnew.VECTOR2I(mm(SILK_H), mm(SILK_H))); t.SetTextThickness(mm(0.1)); t.SetKeepUpright(True)
             placed.append(bx); break
         else:
             t.SetVisible(False); hidden.append(ref)

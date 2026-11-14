@@ -95,6 +95,7 @@ def lib_of(ref, value):
     if ref[0] == "C": return "Device", "C", fpid
     if ref[0] == "L" and ref != "LG1": return "Device", "L", fpid
     if ref == "D1": return "Device", "D_Zener", fpid
+    if ref.startswith("TP"): return "Connector", "TestPoint", fpid
     table = {"J1": ("Connector", "USB_C_Receptacle"), "J2": ("TokenStick_Parts", "USB4105-GF-A"), "U1": ("TokenStick", "RK1828"),
              "U2": ("Interface_USB", "STUSB4500QTR"), "U3": ("TokenStick_Parts", "HD3SS3220"), "U4": ("TokenStick_Parts", "TPD4E05U06DQA"),
              "U5": ("TokenStick_Parts", "TPD4E05U06DQA"), "U6": ("TokenStick_Parts", "TPS56637"), "U7": ("TokenStick_Parts", "AP2112K-3.3"),
@@ -167,8 +168,9 @@ def main():
         ("USB PD INPUT AND LOAD SWITCH", ["J2", "U2", "Q2", "Q1"], ["D1", "R1", "R2", "R3", "R4", "R5", "R6", "C1", "C2", "C3", "C4"]),
         ("5 V BUCK", ["U6"], ["L1", "C11", "R8", "R9", "R10", "R11", "R12", "R14", "C5", "C6", "C9", "C10", "C12", "C13", "C14", "C17"]),
         ("RK1828 (USB and ground only, rest not designed)", ["U1"], ["R13"]),
+        ("TEST POINTS", ["TP1", "TP2", "TP3", "TP4", "TP5", "TP6"], []),
     ]
-    assert {r for b_ in BLOCKS for r in b_[1] + b_[2]} == set(bb.PARTS) - {"LG1"}
+    assert {r for b_ in BLOCKS for r in b_[1] + b_[2]} == set(bb.PARTS) - bb.NO_SCHEMATIC
     SUPPLY = {"GND"}
     y0, page_w = 30.0, 0.0
     for title, mains, small in BLOCKS:

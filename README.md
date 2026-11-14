@@ -53,7 +53,7 @@ These are blocking items, not polish:
 - **Power budget is unresolved.** A third-party RK1828 module lists 13.6 W average and 29.4 W peak. The 5 V buck (6 A) and the stick-sized enclosure have not been validated against that.
 - **Peripheral circuits are checked on paper only.** The STUSB4500, HD3SS3220 and TPS56637 circuits were compared with the manufacturers' datasheets (see `docs/design-notes.md`, section 7), not tested.
 - **Placeholders:** the inductor part and footprint, the 24 MHz crystal, and the VBUS detect divider.
-- **STUSB4500 needs NVM programming** and there is no programming header yet.
+- **STUSB4500 needs NVM programming.** The settings are in `docs/stusb4500-nvm.md`; the profile currents wait for the power budget. I2C is on test points.
 - **The RK1828 land pattern is unverified.** Pad diameter (0.30 mm) is a starting value, not a fab-validated pattern.
 - **Chip availability.** It is not confirmed that Rockchip sells the RK1828 as a bare chip rather than only as a module.
 
