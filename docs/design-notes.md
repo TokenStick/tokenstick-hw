@@ -86,3 +86,22 @@ The three peripheral circuits were first drawn from memory, then checked against
 | HD3SS3220 | PORT low for UFP, ADDR open for GPIO mode, 900k on VBUS_DET, ENn low | Matches, none |
 
 Not covered by this review: the ST reference also shows a 100 ohm resistor and ESD parts on VBUS and CC whose exact placement was not readable from the extracted schematic text, and no layout guidance was checked.
+
+## 8. First PCB placement (2026-11-14)
+
+A first placement pass in Cherry Blossom to test the stick form factor. Nothing is routed yet.
+
+- Board: 85 x 35 mm, 6 copper layers, 1.2 mm, ENIG
+- J1 (data USB-C) on the left edge, J2 (power USB-C) on the right edge
+- RK1828 left of centre with its USB balls (bottom-left corner of the package) facing the HD3SS3220 and J1
+- 5 V buck above the centre, PD sink and the back-to-back FETs next to J2
+- All 44 parts drawn so far fit on the top side with room to spare; the bottom side is empty
+
+What this does not show:
+
+- The RK1828 supply stage is not drawn (rail currents and sequencing unknown). It will be the largest block after the chip itself and will most likely need the bottom side
+- L1 uses a placeholder 1206 footprint; a real 3.3 uH inductor at this current is larger
+- No RK1828 decoupling, crystal or reset parts
+- Cooling: the module vendor lists 13.6 W average, which cannot be dissipated passively in this size. The enclosure has to act as the heatsink and may need a fan
+
+Conclusion so far: the board outline looks feasible with double-sided assembly, but it cannot be confirmed before the supply figures arrive from Rockchip.
