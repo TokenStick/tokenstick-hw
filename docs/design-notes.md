@@ -173,3 +173,12 @@ Known weak points of this pass:
 - J1 VBUS: pads A9/B4 are tied and go to the mux VBUS_DET divider; pads A4/B9 are tied to each other but not to the first pair. The plug shorts all four, so detection works, but they should be joined on a power layer
 - No thermal vias under the FETs and the buck converter, no current or temperature calculation
 - The autorouter result is functional, not tidy; review before fabrication
+
+## 12. Schematic drawn in blocks (2026-11-14)
+
+![Schematic](img/schematic-blocks.png)
+
+- The generated schematic is now organised in four framed blocks: USB-C data path with ESD, mux and 3.3 V regulator; USB PD input and load switch; 5 V buck; RK1828
+- Resistors, capacitors and the inductor are placed next to the IC pin they belong to and wired to it. The far side of each part and all remaining pins carry net labels. Parts that do not attach to a single IC pin (bulk and output capacitors, the EN and FB dividers' second resistors) are in a row at the bottom of their block
+- The schematic netlist still matches the board netlist: 571 pins, checked by connectivity with `kicad/tokenstick/check_netlist.py`
+- It is generated, so it is not as readable as a hand-drawn schematic: no signal-flow wiring between ICs, dividers are not drawn as dividers. Good enough to review connections; a hand-drawn version makes sense once the RK1828 power stage is known

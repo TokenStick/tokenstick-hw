@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generate tokenstick.kicad_sch (KiCad 7) from the netlist in build_board.py.
 
-Every connected pin gets a global label with its net name; there are no drawn wires.
+Parts are grouped in framed blocks. Resistors, capacitors and the inductor sit next to the IC pin they
+belong to and are wired to it; everything else is connected by net labels.
 Unused pins get a no-connect flag, except on the RK1828, whose remaining pins are not designed yet.
 Run:  python3 build_schematic.py   (needs the KiCad symbol libraries)
 """
@@ -124,43 +125,104 @@ def main():
             defs[key] = "    " + blk.replace('(symbol "%s"' % name, '(symbol "%s"' % key, 1).replace("\n", "\n  ")
         return key
 
-    out, x, y, rowh = [], 40.0, 40.0, 0.0
-    order = ["J1", "U4", "U5", "U3", "C15", "C16", "C7", "C8", "R7", "R15", "U7", "C18", "C19", "R13", "U1",
-             "J2", "U2", "Q1", "Q2", "D1", "R1", "R2", "R3", "R4", "R5", "R6", "C1", "C2", "C3", "C4", "C5", "C6",
-             "U6", "L1", "C9", "C10", "C11", "C12", "C13", "C14", "C17", "R8", "R9", "R10", "R11", "R12", "R14"]
-    assert set(order) == set(bb.PARTS) - {"LG1"}
-    PAGE_W = 1100.0
-    for ref in order:
-        lib, name, fpid = lib_of(ref, bb.PARTS[ref][2])
-        key = load(lib, name)
-        for unit, pins in sorted(pinmap[key].items()):
-            xs = [p[1] for p in pins]; ys = [p[2] for p in pins]
-            w = max(xs) - min(xs) + 76.0; h = max(ys) - min(ys) + 30.0
-            if x + w > PAGE_W: x, y, rowh = 40.0, y + rowh + 10.0, 0.0
-            sx = round((x + 38.0 - min(xs)) / 2.54) * 2.54; sy = round((y + 15.0 + max(ys)) / 2.54) * 2.54
-            x += w; rowh = max(rowh, h)
-            out.append('  (symbol (lib_id "%s") (at %.2f %.2f 0) (unit %d) (in_bom yes) (on_board yes) (dnp no) (uuid %s)' % (key, sx, sy, unit, U()))
-            out.append('    (property "Reference" "%s" (at %.2f %.2f 0) %s)' % (ref, sx, sy - max(ys) - 5.08, F))
-            out.append('    (property "Value" "%s" (at %.2f %.2f 0) %s)' % (bb.PARTS[ref][2], sx, sy - max(ys) - 2.54, F))
-            out.append('    (property "Footprint" "%s" (at %.2f %.2f 0) (effects (font (size 1.27 1.27)) hide))' % (fpid, sx, sy))
-            out.append('    (property "Datasheet" "" (at %.2f %.2f 0) (effects (font (size 1.27 1.27)) hide))' % (sx, sy))
-            for num in sorted({p[0] for p in pins}): out.append('    (pin "%s" (uuid %s))' % (num, U()))
-            out.append('    (instances (project "%s" (path "/%s" (reference "%s") (unit %d))))\n  )' % (PROJECT, ROOT, ref, unit))
-            seen = {}
-            for num, px, py, ang in pins:
-                net = pin_net.get(ref + "." + num)
-                pos = (round(sx + px, 2), round(sy - py, 2))
-                if net is None:
-                    if ref != "U1" and pos not in seen:
-                        out.append('  (no_connect (at %.2f %.2f) (uuid %s))' % (*pos, U()))
-                    continue
-                assert seen.get(pos, net) == net, (ref, num, net, seen[pos])
-                if pos in seen: continue
-                seen[pos] = net
-                la = {0: 180, 180: 0, 90: 270, 270: 90}[ang]
-                out.append('  (global_label "%s" (shape passive) (at %.2f %.2f %d) (effects (font (size 1.27 1.27)) (justify %s)) (uuid %s)\n'
-                           '    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 0 0 0) (effects (font (size 1.27 1.27)) hide)))'
-                           % (net, *pos, la, "right" if la in (180, 270) else "left", U()))
+    out = []
+    FS = '(effects (font (size 1.0 1.0)))'
+    TWO = lambda r: r[0] in "RCLD" and r != "LG1"
+
+    def emit(ref, key, unit, sx, sy, rot, pins):
+        """Place one symbol unit; returns {pin number: (x, y, label angle)}."""
+        fpid = lib_of(ref, None)[2]
+        out.append('  (symbol (lib_id "%s") (at %.2f %.2f %d) (unit %d) (in_bom yes) (on_board yes) (dnp no) (uuid %s)' % (key, sx, sy, rot, unit, U()))
+        ys = [p[2] for p in pins]
+        if rot == 0 and not TWO(ref):
+            rp, vp = (sx, sy - max(ys) - 5.08), (sx, sy - max(ys) - 2.54)
+        elif max(abs(p[1]) for p in pins) < 0.01:
+            rp, vp = (sx + 2.54, sy - 1.27), (sx + 2.54, sy + 1.27)
+        else:
+            rp, vp = (sx - 2.0, sy - 1.9), (sx + 2.2, sy - 1.9)
+        just = ' (justify left)' if TWO(ref) and max(abs(p[1]) for p in pins) < 0.01 and rot == 0 else ''
+        out.append('    (property "Reference" "%s" (at %.2f %.2f 0) (effects (font (size 1.0 1.0))%s))' % (ref, *rp, just))
+        out.append('    (property "Value" "%s" (at %.2f %.2f 0) (effects (font (size 1.0 1.0))%s))' % (bb.PARTS[ref][2], *vp, just))
+        out.append('    (property "Footprint" "%s" (at %.2f %.2f 0) (effects (font (size 1.27 1.27)) hide))' % (fpid, sx, sy))
+        out.append('    (property "Datasheet" "" (at %.2f %.2f 0) (effects (font (size 1.27 1.27)) hide))' % (sx, sy))
+        for num in sorted({p[0] for p in pins}): out.append('    (pin "%s" (uuid %s))' % (num, U()))
+        out.append('    (instances (project "%s" (path "/%s" (reference "%s") (unit %d))))\n  )' % (PROJECT, ROOT, ref, unit))
+        res = {}
+        T = {0: lambda px, py: (px, -py), 90: lambda px, py: (-py, -px), 180: lambda px, py: (-px, py), 270: lambda px, py: (py, px)}[rot]
+        for num, px, py, ang in pins:
+            dx, dy = T(px, py)
+            la = {0: 180, 180: 0, 90: 270, 270: 90}[ang] if rot == 0 else (0 if dx > 0 else 180)
+            res[num] = (round(sx + dx, 2), round(sy + dy, 2), la)
+        return res
+
+    def label(net, x, y, la, size=1.27):
+        out.append('  (label "%s" (at %.2f %.2f %d) (effects (font (size %.2f %.2f)) (justify %s bottom)) (uuid %s))'
+                   % (net, x, y, la, size, size, "right" if la in (180, 270) else "left", U()))
+
+    def wire(x1, y1, x2, y2):
+        out.append('  (wire (pts (xy %.2f %.2f) (xy %.2f %.2f)) (stroke (width 0) (type default)) (uuid %s))' % (x1, y1, x2, y2, U()))
+
+    BLOCKS = [
+        ("USB-C DATA, ESD, MUX, 3.3 V", ["J1", "U4", "U5", "U3", "U7"], ["C15", "C16", "C7", "C8", "R7", "R15", "C18", "C19"]),
+        ("USB PD INPUT AND LOAD SWITCH", ["J2", "U2", "Q2", "Q1"], ["D1", "R1", "R2", "R3", "R4", "R5", "R6", "C1", "C2", "C3", "C4"]),
+        ("5 V BUCK", ["U6"], ["L1", "C11", "R8", "R9", "R10", "R11", "R12", "R14", "C5", "C6", "C9", "C10", "C12", "C13", "C14", "C17"]),
+        ("RK1828 (USB and ground only, rest not designed)", ["U1"], ["R13"]),
+    ]
+    assert {r for b_ in BLOCKS for r in b_[1] + b_[2]} == set(bb.PARTS) - {"LG1"}
+    SUPPLY = {"GND"}
+    y0, page_w = 30.0, 0.0
+    for title, mains, small in BLOCKS:
+        free = list(small); x = 30.0; bottom = y0
+        for ref in mains:
+            lib, name, _ = lib_of(ref, None); key = load(lib, name)
+            for unit, pins in sorted(pinmap[key].items()):
+                xs = [p[1] for p in pins]; ys = [p[2] for p in pins]
+                sx = round((x + 44.0 - min(xs)) / 2.54) * 2.54; sy = round((y0 + 22.0 + max(ys)) / 2.54) * 2.54
+                pos = emit(ref, key, unit, sx, sy, 0, pins)
+                seen = {}
+                for num, (px, py, la) in sorted(pos.items(), key=lambda kv: (kv[1][1], kv[1][0])):
+                    net = pin_net.get(ref + "." + num)
+                    if net is None:
+                        if ref != "U1" and (px, py) not in seen: out.append('  (no_connect (at %.2f %.2f) (uuid %s))' % (px, py, U()))
+                        seen.setdefault((px, py), None); continue
+                    assert seen.get((px, py), net) == net, (ref, num)
+                    if (px, py) in seen: continue
+                    seen[(px, py)] = net
+                    sat = None
+                    if la in (0, 180) and net not in SUPPLY:
+                        sat = next((r for r in free if any(pin_net.get(r + "." + q) == net for q in "12")), None)
+                    if sat is None: label(net, px, py, la); continue
+                    free.remove(sat)
+                    slib, sname, _ = lib_of(sat, None); skey = load(slib, sname)
+                    near = "1" if pin_net.get(sat + ".1") == net else "2"
+                    d = 1 if la == 0 else -1                      # direction away from the IC
+                    cx_ = px + d * 12.7
+                    far_ = "2" if near == "1" else "1"
+                    geo = {q[0]: (q[1], q[2]) for q in pinmap[skey][1]}
+                    TT = {0: lambda px_, py_: (px_, -py_), 90: lambda px_, py_: (-py_, -px_), 180: lambda px_, py_: (-px_, py_), 270: lambda px_, py_: (py_, px_)}
+                    rot = next(r_ for r_ in (0, 90, 180, 270) if abs(TT[r_](*geo[near])[1]) < 0.01 and d * (TT[r_](*geo[far_])[0] - TT[r_](*geo[near])[0]) > 0)
+                    sp = emit(sat, skey, 1, cx_, py, rot, pinmap[skey][1])
+                    far = "2" if near == "1" else "1"
+                    assert abs(sp[near][0] - px) < abs(sp[far][0] - px), (sat, rot)
+                    wire(px, py, sp[near][0], sp[near][1])
+                    if sum(1 for v in pin_net.values() if v == net) > len([1 for k_, v in pin_net.items() if v == net and (round(pos.get(k_.split(".")[1], (None, None, 0))[0] or 1e9, 2), round(pos.get(k_.split(".")[1], (None, None, 0))[1] or 1e9, 2)) == (px, py) and k_.startswith(ref + ".")]) + 1:
+                        label(net, min(px, sp[near][0]) + 0.6, py, 0, 1.0)       # net continues elsewhere: name the wire
+                    label(pin_net[sat + "." + far], sp[far][0], sp[far][1], la)
+                x = sx + max(xs) + 44.0
+                bottom = max(bottom, sy - min(ys) + 12.0)
+        # parts that did not attach to an IC pin: one row below, labels on both pins
+        if free:
+            xx = 45.0; yy = bottom + 12.0
+            for r in free:
+                slib, sname, _ = lib_of(r, None); skey = load(slib, sname)
+                sp = emit(r, skey, 1, round(xx / 2.54) * 2.54, round(yy / 2.54) * 2.54, 0, pinmap[skey][1])
+                for q in "12": label(pin_net[r + "." + q], *sp[q])
+                xx += 30.48
+            bottom = yy + 22.0; x = max(x, xx + 20.0)
+        out.append('  (rectangle (start 20 %.2f) (end %.2f %.2f) (stroke (width 0.3) (type dash)) (fill (type none)) (uuid %s))' % (y0 - 8, x, bottom, U()))
+        out.append('  (text "%s" (at 23 %.2f 0) (effects (font (size 3 3) (thickness 0.5) bold) (justify left bottom)) (uuid %s))' % (title, y0 - 1.5, U()))
+        page_w = max(page_w, x); y0 = bottom + 22.0
+    PAGE_W = page_w; y = y0 - 60; rowh = 0
     sch = ['(kicad_sch (version 20230121) (generator tokenstick_gen)', '  (uuid %s)' % ROOT, '  (paper "User" %.0f %.0f)' % (PAGE_W + 40, y + rowh + 60),
            '  (title_block (title "TokenStick v1") (company "TokenStick") (comment 1 "Generated by build_schematic.py from the netlist in build_board.py"))',
            '  (lib_symbols', *defs.values(), '  )', *out, '  (sheet_instances (path "/" (page "1")))', ')']
