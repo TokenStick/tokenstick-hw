@@ -182,3 +182,15 @@ Known weak points of this pass:
 - Resistors, capacitors and the inductor are placed next to the IC pin they belong to and wired to it. The far side of each part and all remaining pins carry net labels. Parts that do not attach to a single IC pin (bulk and output capacitors, the EN and FB dividers' second resistors) are in a row at the bottom of their block
 - The schematic netlist still matches the board netlist: 571 pins, checked by connectivity with `kicad/tokenstick/check_netlist.py`
 - It is generated, so it is not as readable as a hand-drawn schematic: no signal-flow wiring between ICs, dividers are not drawn as dividers. Good enough to review connections; a hand-drawn version makes sense once the RK1828 power stage is known
+
+## 13. Board finish and gold tracks (2026-11-14)
+
+![Gold preview](img/board-gold-preview.png)
+
+Preview of the top side: everything shown in gold is bare copper with ENIG, the rest is black solder mask.
+
+- The KiCad board now carries the finish: black solder mask on both sides, white silkscreen, ENIG. The dielectric thicknesses in the stackup are placeholders that add up to 1.2 mm
+- Outer-layer tracks get a solder mask opening so they are gold plated (`gold_traces()` in `build_board.py`): 62 openings, 192 mm of track
+- The mask stays closed within 0.6 mm of every pad, otherwise solder would run along the bare track during reflow and starve the joint. Short tracks between neighbouring pads therefore stay covered, and so do the BGA fan-out and the copper areas of the power nets
+- Trade-offs: bare tracks are not protected against contamination or scratches, and a differential pair without solder mask has a slightly higher impedance than the same pair under mask. Both pairs of a lane are treated the same way, and the impedance has to be recalculated with the fab's stackup anyway
+- KiCad reports the openings that span two nets as "solder mask bridge". This is intended here and has to be accepted when ordering

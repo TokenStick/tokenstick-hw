@@ -269,6 +269,8 @@ def build():
     import autoroute
     autoroute.run(b, net, sys.modules[__name__])
 
+    gold_traces(b)
+
     # ground planes on inner layers 1 and 4
     for layer in ("In1.Cu", "In4.Cu"):
         z = pcbnew.ZONE(b); z.SetLayer(b.GetLayerID(layer)); z.SetNet(net("GND")); z.SetZoneName("GND " + layer)
@@ -277,6 +279,51 @@ def build():
         z.SetLocalClearance(mm(0.15)); z.SetMinThickness(mm(0.15)); z.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL)
         b.Add(z)
     return b
+
+
+GOLD_PAD_DISTANCE = 0.6     # solder mask stays closed this close to any pad, so solder cannot run along a bare track
+GOLD_MIN_LENGTH = 0.8
+
+
+def gold_traces(b):
+    """Open the solder mask over outer-layer tracks so they are plated with the ENIG finish.
+    The mask stays closed near pads; openings shorter than GOLD_MIN_LENGTH are dropped."""
+    import numpy as np
+    boxes = {pcbnew.F_Cu: [], pcbnew.B_Cu: []}
+    for fp in b.GetFootprints():
+        if fp.GetReference() == "LG1": continue
+        for pad in fp.Pads():
+            bb_ = pad.GetBoundingBox()
+            box = (pcbnew.ToMM(bb_.GetLeft()), pcbnew.ToMM(bb_.GetRight()), pcbnew.ToMM(bb_.GetTop()), pcbnew.ToMM(bb_.GetBottom()))
+            boxes[pcbnew.F_Cu].append(box)
+            if pad.GetAttribute() in (pcbnew.PAD_ATTRIB_PTH, pcbnew.PAD_ATTRIB_NPTH): boxes[pcbnew.B_Cu].append(box)
+    arr = {l: np.array(v) for l, v in boxes.items()}
+    n_open = 0; length = 0.0
+    for t in list(b.GetTracks()):
+        if t.Type() != pcbnew.PCB_TRACE_T or t.GetLayer() not in arr: continue
+        x1, y1, x2, y2 = (pcbnew.ToMM(v) for v in (t.GetStart().x, t.GetStart().y, t.GetEnd().x, t.GetEnd().y))
+        L = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+        if L < GOLD_MIN_LENGTH: continue
+        k = int(L / 0.05) + 1
+        ts = np.linspace(0, 1, k + 1)
+        px = (x1 + ts * (x2 - x1))[:, None]; py = (y1 + ts * (y2 - y1))[:, None]
+        a = arr[t.GetLayer()]
+        dx = np.maximum(np.maximum(a[None, :, 0] - px, px - a[None, :, 1]), 0)
+        dy = np.maximum(np.maximum(a[None, :, 2] - py, py - a[None, :, 3]), 0)
+        ok = np.sqrt(dx * dx + dy * dy).min(axis=1) >= GOLD_PAD_DISTANCE + pcbnew.ToMM(t.GetWidth()) / 2
+        i = 0
+        while i <= k:
+            if not ok[i]: i += 1; continue
+            j = i
+            while j + 1 <= k and ok[j + 1]: j += 1
+            if (ts[j] - ts[i]) * L >= GOLD_MIN_LENGTH:
+                s_ = pcbnew.PCB_SHAPE(b); s_.SetShape(pcbnew.SHAPE_T_SEGMENT)
+                s_.SetLayer(pcbnew.F_Mask if t.GetLayer() == pcbnew.F_Cu else pcbnew.B_Mask)
+                s_.SetStart(pcbnew.VECTOR2I(mm(float(x1 + ts[i] * (x2 - x1))), mm(float(y1 + ts[i] * (y2 - y1)))))
+                s_.SetEnd(pcbnew.VECTOR2I(mm(float(x1 + ts[j] * (x2 - x1))), mm(float(y1 + ts[j] * (y2 - y1)))))
+                s_.SetWidth(t.GetWidth() + mm(0.1)); b.Add(s_); n_open += 1; length += (ts[j] - ts[i]) * L
+            i = j + 1
+    print("gold tracks: %d mask openings, %.0f mm" % (n_open, length))
 
 
 def dump(board, refs):
@@ -295,4 +342,19 @@ if __name__ == "__main__":
     board = pcbnew.LoadBoard(out)          # zones are filled on the reloaded board
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
     pcbnew.SaveBoard(out, board)
+    # board finish: the Python API of KiCad 7 has no stackup access, so the block is written into the file
+    text = open(out).read()
+    assert "(stackup" not in text
+    die = [("prepreg", 0.10), ("core", 0.33), ("prepreg", 0.11), ("core", 0.33), ("prepreg", 0.10)]   # placeholder, 1.2 mm total
+    cu = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"]
+    L = ['    (stackup', '      (layer "F.SilkS" (type "Top Silk Screen") (color "White"))', '      (layer "F.Paste" (type "Top Solder Paste"))',
+         '      (layer "F.Mask" (type "Top Solder Mask") (color "Black") (thickness 0.01))']
+    for i, c in enumerate(cu):
+        L.append('      (layer "%s" (type "copper") (thickness 0.035))' % c)
+        if i < 5: L.append('      (layer "dielectric %d" (type "%s") (thickness %.2f) (material "FR4") (epsilon_r 4.5) (loss_tangent 0.02))' % (i + 1, *die[i]))
+    L += ['      (layer "B.Mask" (type "Bottom Solder Mask") (color "Black") (thickness 0.01))', '      (layer "B.Paste" (type "Bottom Solder Paste"))',
+          '      (layer "B.SilkS" (type "Bottom Silk Screen") (color "White"))', '      (copper_finish "ENIG")', '      (dielectric_constraints no)', '    )']
+    i = text.index("(setup") + len("(setup")
+    open(out, "w").write(text[:i] + "\n" + "\n".join(L) + text[i:])
+    board = pcbnew.LoadBoard(out)           # make sure KiCad still reads it
     print("wrote", out, "footprints", len(board.GetFootprints()), "tracks+vias", len(board.GetTracks()))
