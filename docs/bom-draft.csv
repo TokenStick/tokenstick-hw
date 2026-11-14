@@ -1,0 +1,32 @@
+Ref,Block,Part,Value,Package,Status,Notes
+U1,RK1828,RK1828,,FCBGA-746,Unverified land,Symbol and footprint generated from datasheet pin list
+C15-C16,RK1828,Capacitor,100nF,0402,OK,SuperSpeed TX AC coupling
+R13,RK1828,Resistor,0R,0402,To confirm,Boot strap on SARADC_IN0_BOOT
+J1,USB-C DATA,TYPE-C 24P QT (LCSC C2681555),,SMD,OK,24-pin USB-C receptacle
+U3,USB-C DATA,HD3SS3220RNHR,,QFN-30,Circuit to verify,CC controller and SuperSpeed mux
+U4-U5,USB-C DATA,TPD4E05U06DQAR,,USON-10,OK,ESD on SuperSpeed pairs
+R7,USB-C DATA,Resistor,900k,0402,To verify,VBUS_DET series resistor
+C7-C8,USB-C DATA,Capacitor,100nF,0402,OK,Decoupling
+J2,PD POWER INPUT,USB4105-GF-A,,SMD,OK,16-pin USB-C receptacle (power only)
+U2,PD POWER INPUT,STUSB4500QTR,,QFN-24,Circuit to verify,USB PD sink controller; NVM must be programmed
+Q1,PD POWER INPUT,AON7403,,DFN-8 3x3,OK,P-channel 30V VBUS switch
+D1,PD POWER INPUT,SMF24A,,SOD-123F,OK,VBUS TVS
+R1,PD POWER INPUT,Resistor,470,0402,To verify,VBUS_VS_DISCH
+R2,PD POWER INPUT,Resistor,1k,0402,To verify,DISCH
+R3,PD POWER INPUT,Resistor,22k,0402,To verify,Gate drive
+R4,PD POWER INPUT,Resistor,100k,0402,To verify,Gate pull-up
+R5-R6,PD POWER INPUT,Resistor,10k,0402,OK,I2C pull-ups
+C1,PD POWER INPUT,Capacitor,100nF,0402,To verify,Gate soft-start
+C2-C3,PD POWER INPUT,Capacitor,1uF,0402,OK,VREG_2V7 and VREG_1V2
+C4,PD POWER INPUT,Capacitor,1uF 50V,0603,OK,VBUS
+C5-C6,PD POWER INPUT,Capacitor,10uF 35V,0805,OK,VIN bulk
+U6,5V BUCK,TPS56637RPAR,,VQFN-10,Circuit to verify,6A buck
+L1,5V BUCK,Inductor,2.2uH,Placeholder,Placeholder,Needs a real 6A+ power inductor
+C9-C10,5V BUCK,Capacitor,10uF 35V,0805,OK,Input
+C11,5V BUCK,Capacitor,100nF,0402,OK,Bootstrap
+C12-C14,5V BUCK,Capacitor,22uF 10V,0805,OK,Output
+R8,5V BUCK,Resistor,100k,0402,OK,Feedback top
+R9,5V BUCK,Resistor,13.7k,0402,OK,Feedback bottom
+R10,5V BUCK,Resistor,100k,0402,OK,Power-good pull-up
+R11,5V BUCK,Resistor,100k,0402,To verify,EN pull-up to VIN
+R12,5V BUCK,Resistor,TBD,0402,Placeholder,MODE select; value from TI datasheet
