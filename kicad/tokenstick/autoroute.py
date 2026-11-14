@@ -159,7 +159,7 @@ def run(board, net, cfg):
     failed = []
     # ---- signal and power nets: grow a tree pad by pad
     order = [n for n in cfg.NETS if n != "GND" and n not in cfg.HAND_ROUTED]
-    order.sort(key=lambda n: (n not in cfg.POWER_NETS, len(pads.get(n, []))))
+    order.sort(key=lambda n: (n not in cfg.ROUTE_FIRST, n not in cfg.POWER_NETS, len(pads.get(n, []))))
     for name in order:
         n = nid(name); wide = name in cfg.POWER_NETS
         todo = list(pads.get(name, []))

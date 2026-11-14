@@ -38,7 +38,7 @@ PARTS = {
     "C15": (*C0402, "100nF", -23.4, -6.0, 90),
     "C16": (*C0402, "100nF", -22.4, -4.6, 90),
     "C7": (*C0402, "100nF", -24.2, 0.5, 90),
-    "C8": (*C0402, "100nF", -26.9, -6.9, 0),
+    "C8": (*C0402, "100nF", -27.7, -7.0, 0),
     "R7": (*R0402, "900k", -25.0, -6.9, 0),
     "R15": (*R0402, "200k", -25.2, 0.45, 90),
     "R13": (*R0402, "0R", -23.0, 0.6, 90),
@@ -49,25 +49,25 @@ PARTS = {
     "U1": (LIB, "Rockchip_RK182X_FCBGA-746_19.0x19.0mm_Layout28x28_P0.65mm", "RK1828", -12.0, 0, 0),
     "LG1": (LIB, "TokenStick_Logotype", "logotype", -24.0, 13.8, 0),
     # 5 V buck
-    "U6": (LIB, "Texas_RPA0010A_VQFN-HR-10_3x3mm", "TPS56637RPA", 12.5, 11.0, 0),
-    "L1": (K("Inductor_SMD"), "L_Coilcraft_XAL5030-XXX", "3.3uH", 12.9, 6.0, 270),
-    "C12": (*C0805, "22uF", 10.4, 1.2, 270), "C13": (*C0805, "22uF", 12.4, 1.2, 270),
-    "C14": (*C0805, "22uF", 14.4, 1.2, 270), "C17": (*C0805, "22uF", 16.4, 1.2, 270),
-    "C9": (*C0805, "10uF 35V", 15.5, 13.3, 90), "C10": (*C0805, "10uF 35V", 17.5, 13.3, 90),
-    "C11": (*C0402, "100nF", 15.4, 9.65, 0),
-    "R8": (*R0402, "73.2k", 9.4, 11.3, 0), "R9": (*R0402, "10k", 9.4, 10.2, 0),
-    "R10": (*R0402, "100k", 7.4, 10.2, 0), "R11": (*R0402, "169k", 9.6, 13.4, 0),
-    "R14": (*R0402, "36.1k", 7.6, 13.4, 0), "R12": (*R0402, "10k", 11.0, 14.6, 0),
+    "U6": (LIB, "Texas_RPA0010A_VQFN-HR-10_3x3mm", "TPS56637RPA", 13.6, -0.6, 0),
+    "L1": (K("Inductor_SMD"), "L_Coilcraft_XAL5030-XXX", "3.3uH", 14.0, -5.7, 270),
+    "C12": (*C0805, "22uF", 11.0, -10.5, 270), "C13": (*C0805, "22uF", 13.0, -10.5, 270),
+    "C14": (*C0805, "22uF", 15.0, -10.5, 270), "C17": (*C0805, "22uF", 17.0, -10.5, 270),
+    "C9": (*C0805, "10uF 35V", 16.6, 1.65, 90), "C10": (*C0805, "10uF 35V", 18.6, 1.65, 90),
+    "C11": (*C0402, "100nF", 16.5, -2.0, 0),
+    "R8": (*R0402, "73.2k", 9.8, 0.3, 0), "R9": (*R0402, "10k", 7.8, 0.3, 0),
+    "R10": (*R0402, "100k", 9.8, -0.9, 0), "R11": (*R0402, "169k", 9.8, 1.5, 0),
+    "R14": (*R0402, "36.1k", 7.8, 1.5, 0), "R12": (*R0402, "10k", 9.8, 2.7, 0),
     # USB PD input
     "J2": (K("Connector_USB"), "USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal", "USB4105-GF-A", 38.3, 0, 90),
     "U2": (K("Package_DFN_QFN"), "QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm", "STUSB4500QTR", 28.0, -9.5, 180),
-    "Q1": (*DFN8, "AON7403", 26.0, 11.3, 180), "Q2": (*DFN8, "AON7403", 30.5, 11.3, 0),
+    "Q1": (*DFN8, "AON7403", 25.9, 0, 180), "Q2": (*DFN8, "AON7403", 30.4, 0, 0),
     "D1": (K("Diode_SMD"), "D_SOD-123F", "SMF24A", 32.15, -4.4, 270),
-    "C5": (*C0805, "10uF 35V", 19.5, 13.3, 90), "C6": (*C0805, "10uF 35V", 21.5, 13.3, 90),
+    "C5": (*C0805, "10uF 35V", 20.6, 1.65, 90), "C6": (*C0805, "10uF 35V", 22.6, 1.65, 90),
     "R1": (*R0402, "470", 24.3, -10.75, 0), "R2": (*R0402, "1k", 27.95, -5.6, 270),
-    "R3": (*R0402, "22k", 24.3, -9.75, 0), "R4": (*R0402, "100k", 28.25, 8.9, 0),
+    "R3": (*R0402, "22k", 24.3, -9.75, 0), "R4": (*R0402, "100k", 28.15, -2.6, 0),
     "R5": (*R0402, "10k", 29.05, -5.6, 270), "R6": (*R0402, "10k", 30.1, -5.6, 270),
-    "C1": (*C0402, "100nF", 28.25, 7.9, 0), "C2": (*C0402, "1uF", 28.75, -13.2, 270),
+    "C1": (*C0402, "100nF", 28.15, -3.8, 0), "C2": (*C0402, "1uF", 28.75, -13.2, 270),
     "C3": (*C0402, "1uF", 27.75, -13.2, 270), "C4": (*C0603, "1uF 50V", 32.2, -12.6, 0),
 }
 
@@ -175,9 +175,9 @@ VIAS = [  # (net, x, y)
 VIA_D, VIA_DRILL = 0.45, 0.20
 PWR = 0.35
 TRACKS += [  # common source of the back-to-back FETs, switch node stub
-    ("PD_SRC", "F.Cu", PWR, [(27.55, 10.325), (27.55, 11.625)]), ("PD_SRC", "F.Cu", PWR, [(28.95, 10.975), (28.95, 12.275)]),
-    ("PD_SRC", "F.Cu", PWR, [(27.55, 10.975), (28.95, 10.975)]), ("PD_SRC", "F.Cu", PWR, [(27.55, 11.625), (28.95, 11.625)]),
-    ("BUCK_SW", "F.Cu", 0.25, [(12.875, 8.9), (12.875, 10.0)]),
+    ("PD_SRC", "F.Cu", PWR, [(27.45, -0.975), (27.45, 0.325)]), ("PD_SRC", "F.Cu", PWR, [(28.85, -0.325), (28.85, 0.975)]),
+    ("PD_SRC", "F.Cu", PWR, [(27.45, -0.325), (28.85, -0.325)]), ("PD_SRC", "F.Cu", PWR, [(27.45, 0.325), (28.85, 0.325)]),
+    ("BUCK_SW", "F.Cu", 0.25, [(13.975, -3.0), (13.975, -1.6)]),
     # mux 3.3 V pin: the only way out is a via between the neighbouring pairs
     ("GND", "F.Cu", 0.2, [(28.25, -11.4375), (28.25, -10.5)]),      # STUSB4500 VSYS pin to its exposed pad
     ("3V3", "F.Cu", BGA, [(-24.75, -2.4), (-23.9, -2.4)]),
@@ -188,14 +188,15 @@ TRACKS += [  # common source of the back-to-back FETs, switch node stub
     ("VBUS_DATA", "F.Cu", SS, [(-34.18, 1.5), (-33.1, 1.5), (-32.85, 1.25), (-32.48, 1.25)]),
 ]
 ZONES = [  # copper areas on the top layer: (net, xmin, xmax, ymin, ymax)
-    ("VIN", 13.2, 26.78, 10.45, 12.85),
-    ("VBUS_PD", 31.5, 33.4, -3.7, 12.9), ("VBUS_PD", 29.72, 33.4, 10.0, 12.6),
-    ("BUCK_SW", 10.6, 15.2, 7.1, 9.15),
-    ("5V", 9.6, 17.2, 1.9, 5.0),
+    ("VIN", 14.3, 26.68, -1.2, 1.2),
+    ("VBUS_PD", 31.5, 33.4, -3.7, 2.7), ("VBUS_PD", 29.62, 33.4, -1.2, 1.2),
+    ("BUCK_SW", 11.7, 16.3, -4.5, -2.75),
+    ("5V", 10.2, 17.8, -9.9, -6.6),
 ]
 POWER_NETS = {"VBUS_PD", "PD_SRC", "VIN", "BUCK_SW", "5V", "3V3"}
 POWER_REFS = {"J2", "Q1", "Q2", "U6", "L1", "C5", "C6", "C9", "C10", "C12", "C13", "C14", "C17", "U7", "C18", "C19"}   # pads that carry load current
 VIAS += [("3V3", -23.9, -2.4), ("VBUS_DATA", -31.0, -1.25), ("Net-(R7-2)", -23.95, -4.1)]
+ROUTE_FIRST = ["VBUS_DATA", "Net-(R7-2)", "3V3"]      # short nets in the crowded USB corner
 HAND_ROUTED = {t[0] for t in TRACKS} - {"PD_SRC", "BUCK_SW", "3V3", "VBUS_DATA", "Net-(R7-2)"}
 
 
@@ -270,6 +271,13 @@ def build():
     autoroute.run(b, net, sys.modules[__name__])
 
     gold_traces(b)
+    for txt, x, y in (("USB DATA", -31.0, -7.6), ("RK1828", -12.0, -11.0), ("5V BUCK", 13.6, 4.4), ("LOAD SWITCH", 28.15, 2.6), ("USB PD", 28.0, -15.4), ("PWR IN", 37.0, 6.4), ("DATA", -38.5, 6.4)):
+        t = pcbnew.PCB_TEXT(b); t.SetText(txt); t.SetLayer(pcbnew.F_SilkS); t.SetPosition(P(x, y))
+        t.SetTextSize(pcbnew.VECTOR2I(mm(0.9), mm(0.9))); t.SetTextThickness(mm(0.15)); b.Add(t)
+    r = pcbnew.PCB_SHAPE(b); r.SetShape(pcbnew.SHAPE_T_RECT); r.SetLayer(pcbnew.Dwgs_User); r.SetWidth(mm(0.15))
+    r.SetStart(P(-1.0, 16.5)); r.SetEnd(P(6.6, -16.5)); b.Add(r)
+    t = pcbnew.PCB_TEXT(b); t.SetText("reserved: RK1828 regulators"); t.SetLayer(pcbnew.Dwgs_User); t.SetPosition(P(2.9, 0)); t.SetTextAngleDegrees(90)
+    t.SetTextSize(pcbnew.VECTOR2I(mm(1.2), mm(1.2))); t.SetTextThickness(mm(0.15)); b.Add(t)
 
     # ground planes on inner layers 1 and 4
     for layer in ("In1.Cu", "In4.Cu"):

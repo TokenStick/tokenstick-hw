@@ -194,3 +194,16 @@ Preview of the top side: everything shown in gold is bare copper with ENIG, the 
 - The mask stays closed within 0.6 mm of every pad, otherwise solder would run along the bare track during reflow and starve the joint. Short tracks between neighbouring pads therefore stay covered, and so do the BGA fan-out and the copper areas of the power nets
 - Trade-offs: bare tracks are not protected against contamination or scratches, and a differential pair without solder mask has a slightly higher impedance than the same pair under mask. Both pairs of a lane are treated the same way, and the impedance has to be recalculated with the fab's stackup anyway
 - KiCad reports the openings that span two nets as "solder mask bridge". This is intended here and has to be accepted when ordering
+
+## 14. Floorplan made systematic (2026-11-14)
+
+The board is now laid out along its long axis in the direction of power and signal flow (images in sections 11 and 13 show this state):
+
+- Left end: data connector J1, ESD, mux, 3.3 V regulator, then the RK1828. This corner stays dense on purpose; the SuperSpeed pairs have to be short
+- Right end: power connector J2 on the same axis as J1
+- From J2 towards the middle, in one line: TVS, load switch (Q2, Q1), four input capacitors in a row at 2 mm pitch, buck converter, inductor below it, four output capacitors in a row
+- Buck resistors in a two-column grid next to the converter pins, in pin order. PD controller with its parts below the load switch
+- A strip between the buck and the RK1828 is reserved for the RK1828 regulators (drawn on the Dwgs.User layer)
+- Block names are on the silkscreen. Reference designators still overlap in places; silkscreen clean-up is not done
+
+DRC is unchanged: clean apart from the RK1828 pins that are not designed and C16 inside the RK1828 courtyard.
